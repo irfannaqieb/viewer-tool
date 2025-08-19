@@ -1,0 +1,219 @@
+{
+  "baseUrl": "/images/pertamina/",
+  "directoryName": "pertamina",
+  "images": [
+    {
+      "id": "1",
+      "panorama": "/images/pertamina/IMG_20250623_091847_00_025.jpg",
+      "gps": [
+        106.2569290399523,
+        -5.450691879998811
+      ],
+      "panoData": {
+        "poseHeading": 177.26776648310732
+      },
+      "links": {
+        "next": {
+          "nodeId": "2"
+        },
+        "prev": {
+          "nodeId": "8"
+        }
+      },
+      "_metadata": {
+        "filename": "IMG_20250623_091847_00_025.jpg",
+        "originalLinks": [],
+        "northCalibration": {
+          "heading": 177.26776648310732,
+          "isSet": true
+        }
+      }
+    },
+    {
+      "id": "2",
+      "panorama": "/images/pertamina/IMG_20250623_091903_00_026.jpg",
+      "gps": [
+        106.25693348000057,
+        -5.450691730003619
+      ],
+      "panoData": {
+        "poseHeading": 160.45508838809025
+      },
+      "links": {
+        "next": {
+          "nodeId": "3"
+        },
+        "prev": {
+          "nodeId": "1"
+        }
+      },
+      "_metadata": {
+        "filename": "IMG_20250623_091903_00_026.jpg",
+        "originalLinks": [],
+        "northCalibration": {
+          "heading": 160.45508838809025,
+          "isSet": true
+        }
+      }
+    },
+    {
+      "id": "3",
+      "panorama": "/images/pertamina/IMG_20250623_091925_00_027.jpg",
+      "gps": [
+        106.2569391500012,
+        -5.450691970003959
+      ],
+      "panoData": {
+        "poseHeading": 97.12218121936225
+      },
+      "links": {
+        "next": {
+          "nodeId": "4"
+        },
+        "prev": {
+          "nodeId": "2"
+        }
+      },
+      "_metadata": {
+        "filename": "IMG_20250623_091925_00_027.jpg",
+        "originalLinks": [],
+        "northCalibration": {
+          "heading": 97.12218121936225,
+          "isSet": true
+        }
+      }
+    },
+    {
+      "id": "4",
+      "panorama": "/images/pertamina/IMG_20250623_091953_00_028.jpg",
+      "gps": [
+        106.25694239995639,
+        -5.450692559996741
+      ],
+      "panoData": {
+        "poseHeading": 185.31209229367656
+      },
+      "links": {
+        "next": {
+          "nodeId": "5"
+        },
+        "prev": {
+          "nodeId": "3"
+        }
+      },
+      "_metadata": {
+        "filename": "IMG_20250623_091953_00_028.jpg",
+        "originalLinks": [],
+        "northCalibration": {
+          "heading": 185.31209229367656,
+          "isSet": true
+        }
+      }
+    },
+    {
+      "id": "5",
+      "panorama": "/images/pertamina/IMG_20250623_092037_00_029.jpg",
+      "gps": [
+        106.25695227999017,
+        -5.4506935399990954
+      ],
+      "panoData": {
+        "poseHeading": 120.95984847673486
+      },
+      "links": {
+        "next": {
+          "nodeId": "6"
+        },
+        "prev": {
+          "nodeId": "4"
+        }
+      },
+      "_metadata": {
+        "filename": "IMG_20250623_092037_00_029.jpg",
+        "originalLinks": [],
+        "northCalibration": {
+          "heading": 120.95984847673486,
+          "isSet": true
+        }
+      }
+    },
+    {
+      "id": "6",
+      "panorama": "/images/pertamina/IMG_20250624_124442_00_269.jpg",
+      "gps": [
+        106.25681888000592,
+        -5.450444490000455
+      ],
+      "panoData": {
+        "poseHeading": 291.00291370820713
+      },
+      "links": {
+        "next": {
+          "nodeId": "7"
+        },
+        "prev": {
+          "nodeId": "5"
+        }
+      },
+      "_metadata": {
+        "filename": "IMG_20250624_124442_00_269.jpg",
+        "originalLinks": [],
+        "northCalibration": {
+          "heading": 291.00291370820713,
+          "isSet": true
+        }
+      }
+    },
+    {
+      "id": "7",
+      "panorama": "/images/pertamina/IMG_20250624_124634_00_270.jpg",
+      "gps": [
+        106.25695064994447,
+        -5.450469089999865
+      ],
+      "panoData": {
+        "poseHeading": 221.76390962240032
+      },
+      "links": {
+        "next": {
+          "nodeId": "8"
+        },
+        "prev": {
+          "nodeId": "6"
+        }
+      },
+      "_metadata": {
+        "filename": "IMG_20250624_124634_00_270.jpg",
+        "originalLinks": [],
+        "northCalibration": {
+          "heading": 221.76390962240032,
+          "isSet": true
+        }
+      }
+    },
+    {
+      "id": "8",
+      "panorama": "/images/pertamina/IMG_20250624_124645_00_271.jpg",
+      "gps": [
+        106.2569521700316,
+        -5.4504618500017346
+      ],
+      "panoData": {
+        "poseHeading": 0
+      },
+      "links": {
+        "next": {
+          "nodeId": "1"
+        },
+        "prev": {
+          "nodeId": "7"
+        }
+      },
+      "_metadata": {
+        "filename": "IMG_20250624_124645_00_271.jpg",
+        "originalLinks": [],
+        "northCalibration": null
+      }
+    }
+  ]
+}
