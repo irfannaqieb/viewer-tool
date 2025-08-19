@@ -9,6 +9,9 @@ dist
 # Node dependencies
 node_modules
 
+# public folder
+public
+
 # Logs
 logs
 *.log
