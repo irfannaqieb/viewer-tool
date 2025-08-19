@@ -1,35 +1,53 @@
+# 360° Image Linker Tool
 
-Use `bun`
+A powerful tool for creating interactive 360° image tours by linking panoramic images together. Built with Nuxt.js and Photo Sphere Viewer.
 
-360 Image Viewer: https://github.com/mistic100/Photo-Sphere-Viewer
+## Features
 
-Markers documentation: https://photo-sphere-viewer.js.org/plugins/markers.html
+- Load and view 360° panoramic images
+- Create bidirectional links between images (next/previous)
+- Compass calibration for north direction
+- GPS coordinates display (extracted from image EXIF data)
+- Export configuration
 
+## Getting Started
 
-## To Do
+1. Install dependencies:
 
-**LiDAR**
+```bash
+bun install
+```
 
-- [X] Display PCD
-- [x] Hover point indicator
-- [x] Right click to create
-- [x] have a list of findings
-- [x] click on finding point to view attr
-- [x] Keep important attributes of findings (PCD index, XYZ normalize and no)
-- [x] Display the created findings on scene
+2. Place your 360° images in subdirectories under `public/images/`
+   Example structure:
 
-**360 Image**
+   ```
+   public/images/
+   ├── dir1/
+   │   ├── image1.jpg
+   │   ├── image2.jpg
+   ├── dir2/
+   │   ├── image3.jpg
+   ```
 
-- [ ]
+3. Run the development server:
 
+```bash
+bun run dev
+```
 
-# Generate Digital elevation models (DEMs) from Point Cloud
+4. Open your browser and navigate to the local development URL
 
-- https://github.com/opengeos/lidar
-- https://applied-geosolutions.github.io/lidar2dems/
-- https://opensourceoptions.com/how-to-create-a-dem-or-raster-from-a-lidar-point-cloud/
+## How It Works
 
-# Display DEM on threejs
-
-- https://github.com/jonathanlurie/ThreejsDEM
-- https://github.com/orabazu/threejs-dem-visualizer
+1. **Directory Selection**: Choose a directory containing your 360° images
+2. **Image Navigation**: Browse through images using next/previous buttons
+3. **Creating Links**:
+   - Select an image
+   - Click "Set" next to "Next" or "Previous"
+   - Choose target image from the list
+   - Links are bidirectional (if A → B is set as "next", B → A is automatically set as "previous")
+4. **Compass Calibration**:
+   - Rotate view to face north
+   - Click "Set Current Direction as North"
+5. **Export**: Generate a tour configuration file compatible with Photo Sphere Viewer
