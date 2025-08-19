@@ -4,24 +4,20 @@ export default defineNuxtConfig({
 	devtools: { enabled: true },
 	modules: [
 		// '@nuxtjs/tailwindcss',
-		'@nuxt/ui'
+		"@nuxt/ui",
 	],
 	app: {
 		head: {
-			title: '360 Image Viewer',
+			title: "360 Image Viewer",
 			link: [
 				{
-					rel: 'stylesheet',
-					href: 'https://fonts.googleapis.com/css?family=Poppins'
-				},
-				{
-					rel: 'stylesheet',
-					href: 'https://fonts.googleapis.com/css?family=Staatliches'
+					rel: "stylesheet",
+					href: "https://fonts.googleapis.com/css?family=Poppins",
 				},
 			],
-		}
+		},
 	},
 	colorMode: {
-		preference: 'light'
-	}
-})
+		preference: "light",
+	},
+});
