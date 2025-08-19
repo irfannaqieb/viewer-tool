@@ -1,6 +1,6 @@
 # 360° Image Linker Tool
 
-A powerful tool for creating interactive 360° image tours by linking panoramic images together. Built with Nuxt.js and Photo Sphere Viewer.
+A tool for linking 360° images to generate in sequence viewing.
 
 ## Features
 
@@ -51,3 +51,4 @@ bun run dev
    - Rotate view to face north
    - Click "Set Current Direction as North"
 5. **Export**: Generate a tour configuration file compatible with Photo Sphere Viewer
+6. **Result** Example output result is as in example-output.json
