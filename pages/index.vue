@@ -1197,10 +1197,9 @@ const exportLinks = () => {
 				gps: gps,
 				panoData: { poseHeading: poseHeading },
 				links: Object.keys(links).length > 0 ? links : {},
-				// Keep original data for reference
+				// Keep metadata for reference
 				_metadata: {
 					filename: img.filename,
-					originalLinks: img.links,
 					northCalibration: img.northCalibration,
 				},
 			};
