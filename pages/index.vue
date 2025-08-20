@@ -289,68 +289,47 @@
 
 				<!-- Link Management -->
 				<div class="mb-4">
-					<label class="block text-sm text-gray-300 mb-2"
-						>Manage Navigation:</label
-					>
+					<label class="block text-sm text-gray-300 mb-2">Manage Links:</label>
 
-					<!-- Current Navigation Links -->
-					<div class="mb-3 p-2 bg-gray-800 rounded space-y-2">
-						<!-- Next Link -->
-						<div class="flex items-center justify-between">
-							<div class="flex items-center space-x-2">
-								<span class="text-xs text-gray-400">Next:</span>
-								<span class="text-xs text-white">
-									{{
-										currentNode?.nextLink
-											? getImageNameById(currentNode.nextLink)
-											: "Not set"
-									}}
+					<!-- Current Links -->
+					<div class="mb-3 p-2 bg-gray-800 rounded">
+						<div class="flex items-center justify-between mb-2">
+							<span class="text-xs text-gray-400">
+								Current Links ({{ currentNode?.links?.length || 0 }})
+							</span>
+							<button
+								@click="openLinkSelector()"
+								class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs"
+							>
+								+ Add Link
+							</button>
+						</div>
+
+						<!-- List of current links -->
+						<div v-if="currentNode?.links?.length > 0" class="space-y-1">
+							<div
+								v-for="(link, index) in currentNode.links"
+								:key="index"
+								class="flex items-center justify-between bg-gray-700 px-2 py-1 rounded text-xs"
+							>
+								<span class="text-white truncate">
+									{{ getImageNameById(link.nodeId) }}
 								</span>
-							</div>
-							<div class="flex space-x-1">
-								<button
-									@click="openLinkSelector('next')"
-									class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs"
-								>
-									Set
-								</button>
-								<button
-									v-if="currentNode?.nextLink"
-									@click="removeDirectionalLink('next')"
-									class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs"
-								>
-									✕
-								</button>
+								<div class="flex items-center space-x-1">
+									<span class="text-gray-400">#{{ link.nodeId }}</span>
+									<button
+										@click="removeLink(link.nodeId)"
+										class="px-1 py-0.5 bg-red-600 hover:bg-red-700 rounded text-xs"
+									>
+										✕
+									</button>
+								</div>
 							</div>
 						</div>
 
-						<!-- Previous Link -->
-						<div class="flex items-center justify-between">
-							<div class="flex items-center space-x-2">
-								<span class="text-xs text-gray-400">Previous:</span>
-								<span class="text-xs text-white">
-									{{
-										currentNode?.previousLink
-											? getImageNameById(currentNode.previousLink)
-											: "Not set"
-									}}
-								</span>
-							</div>
-							<div class="flex space-x-1">
-								<button
-									@click="openLinkSelector('previous')"
-									class="px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs"
-								>
-									Set
-								</button>
-								<button
-									v-if="currentNode?.previousLink"
-									@click="removeDirectionalLink('previous')"
-									class="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs"
-								>
-									✕
-								</button>
-							</div>
+						<!-- No links message -->
+						<div v-else class="text-xs text-gray-400 text-center py-2">
+							No links set for this image
 						</div>
 					</div>
 
@@ -361,7 +340,7 @@
 					>
 						<div class="flex justify-between items-center">
 							<span class="text-sm text-gray-300">
-								Set {{ linkDirection }} link for {{ currentImageName }}:
+								Add link from {{ currentImageName }}:
 							</span>
 							<button
 								@click="closeLinkSelector"
@@ -417,7 +396,7 @@
 								<div
 									v-for="result in linkSearchResults"
 									:key="result.id"
-									@click="setDirectionalLink(result.id)"
+									@click="addLink(result.id)"
 									class="px-2 py-1 hover:bg-gray-600 cursor-pointer text-xs flex justify-between items-center"
 								>
 									<span class="truncate">{{ result.filename }}</span>
@@ -432,12 +411,12 @@
 								<div
 									class="px-2 py-1 text-xs text-gray-400 bg-gray-800 border-b border-gray-600"
 								>
-									Available Images ({{ availableForDirectionalLink.length }})
+									Available Images ({{ availableForLink.length }})
 								</div>
 								<div
-									v-for="image in availableForDirectionalLink"
+									v-for="image in availableForLink"
 									:key="image.id"
-									@click="setDirectionalLink(image.id)"
+									@click="addLink(image.id)"
 									class="px-2 py-1 hover:bg-gray-600 cursor-pointer text-xs flex justify-between items-center"
 								>
 									<span class="truncate">{{ image.filename }}</span>
@@ -716,9 +695,8 @@ const statusMessage = ref("");
 const showSearchDropdown = ref(false);
 const showLinkDropdown = ref(false);
 
-// Directional linking state
+// Link selector state
 const showLinkSelector = ref(false);
-const linkDirection = ref(""); // 'next' or 'previous'
 
 // Project and directory management
 const selectedProject = ref("");
@@ -836,8 +814,8 @@ const loadImagesFromDirectory = async (directoryName) => {
 	}
 };
 
-// savee progress to localStorage
-const saveProgressToStorage = () => {
+// save progress to localStorage and JSON file
+const saveProgressToStorage = async () => {
 	if (!saveProgress.value) return;
 
 	try {
@@ -855,8 +833,6 @@ const saveProgressToStorage = () => {
 				id: img.id,
 				filename: img.filename,
 				links: img.links,
-				nextLink: img.nextLink,
-				previousLink: img.previousLink,
 				northCalibration: img.northCalibration,
 				gpsCoordinates: img.gpsCoordinates,
 			})),
@@ -870,11 +846,30 @@ const saveProgressToStorage = () => {
 			},
 		};
 
+		// Save to localStorage
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
+
+		// Save to JSON file
+		try {
+			await $fetch("/api/save-progress", {
+				method: "POST",
+				body: { progressData },
+			});
+		} catch (fileError) {
+			console.error("Error saving to file:", fileError);
+			// Don't throw - localStorage save was successful
+			if (arguments[0] === "manual") {
+				showStatus(
+					"Progress saved to localStorage, but failed to save to file"
+				);
+				return;
+			}
+		}
+
 		lastSaved.value = new Date().toLocaleTimeString();
 
 		if (arguments[0] === "manual") {
-			showStatus("Progress saved successfully");
+			showStatus("Progress saved successfully to localStorage and file");
 		}
 	} catch (error) {
 		console.error("Error saving progress:", error);
@@ -942,8 +937,6 @@ const loadProgressFromStorage = async () => {
 				if (currentImg) {
 					// Restore links and calibrations
 					currentImg.links = savedImg.links || [];
-					currentImg.nextLink = savedImg.nextLink;
-					currentImg.previousLink = savedImg.previousLink;
 					currentImg.northCalibration = savedImg.northCalibration;
 					// Don't override GPS coordinates from EXIF, but restore if none found
 					if (!currentImg.gpsCoordinates && savedImg.gpsCoordinates) {
@@ -1094,7 +1087,7 @@ const onSubSectionChange = async (subSectionName) => {
 	);
 
 	// Auto-save progress after directory change
-	saveProgressToStorage();
+	await saveProgressToStorage();
 };
 
 // Helper function to clear current image data
@@ -1131,7 +1124,7 @@ const onDirectoryChange = async (directoryName) => {
 	showStatus(`Loaded ${IMAGE_FILES.value.length} images from ${directoryName}`);
 
 	// Auto-save progress after directory change
-	saveProgressToStorage();
+	await saveProgressToStorage();
 };
 
 // Initialize image data
@@ -1143,9 +1136,7 @@ const initializeImages = async () => {
 			id: (index + 1).toString(),
 			filename: imageInfo.filename,
 			panorama: imageInfo.path,
-			links: [],
-			nextLink: null,
-			previousLink: null,
+			links: [], // Array of {nodeId: string} objects
 			northCalibration: null, // { heading: number, isSet: boolean }
 			gpsCoordinates: null, // { latitude: number, longitude: number, altitude?: number }
 		};
@@ -1180,12 +1171,18 @@ const initializeImages = async () => {
 	}
 };
 
-// return all images except the current image
-const availableForDirectionalLink = computed(() => {
+// return all images except the current image and already linked images
+const availableForLink = computed(() => {
 	if (!currentNode.value) return imageList.value;
 
-	// For directional linking, exclude only the current image
-	return imageList.value.filter((image) => image.id !== currentNode.value?.id);
+	// Get already linked image IDs from current image
+	const linkedIds = (currentNode.value.links || []).map((link) => link.nodeId);
+
+	// Exclude current image and already linked images
+	return imageList.value.filter(
+		(image) =>
+			image.id !== currentNode.value?.id && !linkedIds.includes(image.id)
+	);
 });
 
 // ------------- Search functionality -------------
@@ -1208,11 +1205,15 @@ const handleLinkSearch = () => {
 		return;
 	}
 
-	// For directional linking, only exclude current image
+	// Get already linked image IDs
+	const linkedIds = (currentNode.value?.links || []).map((link) => link.nodeId);
+
+	// Exclude current image and already linked images
 	linkSearchResults.value = imageList.value
 		.filter(
 			(image) =>
 				image.id !== currentNode.value?.id &&
+				!linkedIds.includes(image.id) &&
 				image.filename
 					.toLowerCase()
 					.includes(linkSearchQuery.value.toLowerCase())
@@ -1240,9 +1241,8 @@ const selectImageFromDropdown = (imageId) => {
 	showSearchDropdown.value = false;
 };
 
-// ------------- Directional linking functions -------------
-const openLinkSelector = (direction) => {
-	linkDirection.value = direction;
+// ------------- Link management functions -------------
+const openLinkSelector = () => {
 	showLinkSelector.value = true;
 	linkSearchQuery.value = "";
 	linkSearchResults.value = [];
@@ -1251,13 +1251,12 @@ const openLinkSelector = (direction) => {
 
 const closeLinkSelector = () => {
 	showLinkSelector.value = false;
-	linkDirection.value = "";
 	linkSearchQuery.value = "";
 	linkSearchResults.value = [];
 	showLinkDropdown.value = false;
 };
 
-const setDirectionalLink = (targetImageId) => {
+const addLink = async (targetImageId) => {
 	if (!currentNode.value) return;
 
 	const currentImage = imageList.value.find(
@@ -1267,109 +1266,75 @@ const setDirectionalLink = (targetImageId) => {
 
 	if (!currentImage || !targetImage) return;
 
-	if (linkDirection.value === "next") {
-		// Remove existing next link if it exists
-		if (currentImage.nextLink) {
-			const oldTargetImage = imageList.value.find(
-				(img) => img.id === currentImage.nextLink
-			);
-			if (oldTargetImage && oldTargetImage.previousLink === currentImage.id) {
-				oldTargetImage.previousLink = null;
-			}
-		}
-
-		// Remove existing previous link from target if it exists
-		if (targetImage.previousLink) {
-			const oldSourceImage = imageList.value.find(
-				(img) => img.id === targetImage.previousLink
-			);
-			if (oldSourceImage && oldSourceImage.nextLink === targetImage.id) {
-				oldSourceImage.nextLink = null;
-			}
-		}
-
-		// Set current -> target as next
-		currentImage.nextLink = targetImageId;
-		// Set target -> current as previous (bidirectional)
-		targetImage.previousLink = currentImage.id;
-		showStatus(
-			`Set next link: ${getImageNameById(targetImageId)} (bidirectional)`
-		);
-	} else if (linkDirection.value === "previous") {
-		// Remove existing previous link if it exists
-		if (currentImage.previousLink) {
-			const oldTargetImage = imageList.value.find(
-				(img) => img.id === currentImage.previousLink
-			);
-			if (oldTargetImage && oldTargetImage.nextLink === currentImage.id) {
-				oldTargetImage.nextLink = null;
-			}
-		}
-
-		// Remove existing next link from target if it exists
-		if (targetImage.nextLink) {
-			const oldSourceImage = imageList.value.find(
-				(img) => img.id === targetImage.nextLink
-			);
-			if (oldSourceImage && oldSourceImage.previousLink === targetImage.id) {
-				oldSourceImage.previousLink = null;
-			}
-		}
-
-		// Set current -> target as previous
-		currentImage.previousLink = targetImageId;
-		// Set target -> current as next (bidirectional)
-		targetImage.nextLink = currentImage.id;
-		showStatus(
-			`Set previous link: ${getImageNameById(targetImageId)} (bidirectional)`
-		);
+	// Check if link already exists from current to target
+	const existingLink = currentImage.links.find(
+		(link) => link.nodeId === targetImageId
+	);
+	if (existingLink) {
+		showStatus("Link already exists");
+		return;
 	}
+
+	// Add bidirectional links
+	// Current -> Target
+	currentImage.links.push({ nodeId: targetImageId });
+
+	// Target -> Current (bidirectional)
+	const existingBackLink = targetImage.links.find(
+		(link) => link.nodeId === currentImage.id
+	);
+	if (!existingBackLink) {
+		targetImage.links.push({ nodeId: currentImage.id });
+	}
+
+	showStatus(
+		`Added bidirectional link with: ${getImageNameById(targetImageId)}`
+	);
 
 	// Update the viewer nodes to reflect changes
 	updateViewerNodes();
 	closeLinkSelector();
 
 	// Auto-save progress
-	saveProgressToStorage();
+	await saveProgressToStorage();
 };
 
-const removeDirectionalLink = (direction) => {
+const removeLink = async (targetImageId) => {
 	if (!currentNode.value) return;
 
 	const currentImage = imageList.value.find(
 		(img) => img.id === currentNode.value.id
 	);
-	if (!currentImage) return;
+	const targetImage = imageList.value.find((img) => img.id === targetImageId);
 
-	if (direction === "next" && currentImage.nextLink) {
-		// Find the target image and remove its reverse link
-		const targetImage = imageList.value.find(
-			(img) => img.id === currentImage.nextLink
-		);
-		if (targetImage && targetImage.previousLink === currentImage.id) {
-			targetImage.previousLink = null;
-		}
-		// Remove the next link from current image
-		currentImage.nextLink = null;
-		showStatus("Removed next link (bidirectional)");
-	} else if (direction === "previous" && currentImage.previousLink) {
-		// Find the target image and remove its reverse link
-		const targetImage = imageList.value.find(
-			(img) => img.id === currentImage.previousLink
-		);
-		if (targetImage && targetImage.nextLink === currentImage.id) {
-			targetImage.nextLink = null;
-		}
-		// Remove the previous link from current image
-		currentImage.previousLink = null;
-		showStatus("Removed previous link (bidirectional)");
+	if (!currentImage || !targetImage) return;
+
+	// Remove bidirectional links
+	// Remove Current -> Target link
+	const linkIndex = currentImage.links.findIndex(
+		(link) => link.nodeId === targetImageId
+	);
+	if (linkIndex !== -1) {
+		currentImage.links.splice(linkIndex, 1);
 	}
+
+	// Remove Target -> Current link (bidirectional)
+	const backLinkIndex = targetImage.links.findIndex(
+		(link) => link.nodeId === currentImage.id
+	);
+	if (backLinkIndex !== -1) {
+		targetImage.links.splice(backLinkIndex, 1);
+	}
+
+	showStatus(
+		`Removed bidirectional link with: ${getImageNameById(targetImageId)}`
+	);
 
 	// Update the viewer nodes to reflect changes
 	updateViewerNodes();
 
 	// Auto-save progress
-	saveProgressToStorage();
+	await saveProgressToStorage();
 };
 
 // ------------- Navigation -------------
@@ -1397,9 +1362,9 @@ const navigateToImage = (imageId) => {
 };
 
 const nextImage = () => {
-	if (currentNode.value?.nextLink) {
-		// Use the set next link
-		navigateToImage(currentNode.value.nextLink);
+	// Navigate to first linked image if available, otherwise sequential
+	if (currentNode.value?.links?.length > 0) {
+		navigateToImage(currentNode.value.links[0].nodeId);
 	} else {
 		// Fallback to sequential navigation
 		if (currentImageIndex.value < imageList.value.length - 1) {
@@ -1411,9 +1376,10 @@ const nextImage = () => {
 };
 
 const previousImage = () => {
-	if (currentNode.value?.previousLink) {
-		// Use the set previous link
-		navigateToImage(currentNode.value.previousLink);
+	// Navigate to last linked image if available, otherwise sequential
+	if (currentNode.value?.links?.length > 0) {
+		const lastLinkIndex = currentNode.value.links.length - 1;
+		navigateToImage(currentNode.value.links[lastLinkIndex].nodeId);
 	} else {
 		// Fallback to sequential navigation
 		if (currentImageIndex.value > 0) {
@@ -1483,7 +1449,7 @@ const showStatus = (message) => {
 	}, 3000);
 };
 
-const clearAllLinks = () => {
+const clearAllLinks = async () => {
 	let projectInfo = "";
 	if (
 		selectedProject.value &&
@@ -1503,11 +1469,7 @@ const clearAllLinks = () => {
 
 	// Count existing links for the warning
 	const linkCount = imageList.value.reduce((count, image) => {
-		let imageLinks = 0;
-		if (image.nextLink) imageLinks++;
-		if (image.previousLink) imageLinks++;
-		if (image.links && image.links.length > 0) imageLinks += image.links.length;
-		return count + imageLinks;
+		return count + (image.links ? image.links.length : 0);
 	}, 0);
 
 	const calibrationCount = imageList.value.filter(
@@ -1527,8 +1489,6 @@ const clearAllLinks = () => {
 		// User confirmed, proceed with clearing
 		imageList.value.forEach((image) => {
 			image.links = [];
-			image.nextLink = null;
-			image.previousLink = null;
 			image.northCalibration = null;
 		});
 
@@ -1537,7 +1497,7 @@ const clearAllLinks = () => {
 		showStatus(
 			`Cleared all links and compass calibrations from ${projectInfo}`
 		);
-		saveProgressToStorage();
+		await saveProgressToStorage();
 	} else {
 		showStatus("Clear operation cancelled");
 	}
@@ -1558,14 +1518,8 @@ const exportLinks = () => {
 				}
 			}
 
-			// Format links as next/prev object
-			const links = {};
-			if (img.nextLink) {
-				links.next = { nodeId: img.nextLink };
-			}
-			if (img.previousLink) {
-				links.prev = { nodeId: img.previousLink };
-			}
+			// Use the links array directly
+			const links = img.links || [];
 
 			// Get pose heading from north calibration
 			let poseHeading = 0;
@@ -1578,7 +1532,7 @@ const exportLinks = () => {
 				panorama: BASE_URL.value + img.filename,
 				gps: gps,
 				sphereCorrection: { pan: poseHeading, tilt: 0, roll: 0 },
-				links: Object.keys(links).length > 0 ? links : {},
+				links: links,
 				// Keep metadata for reference
 				_metadata: {
 					filename: img.filename,
@@ -1752,42 +1706,26 @@ const importConfiguration = async (config) => {
 			);
 
 			if (currentImage) {
-				// Import next/prev links
-				if (configImage.links) {
-					if (configImage.links.next?.nodeId) {
-						// Find target image by ID from config
-						const targetConfigImage = config.images.find(
-							(ci) => ci.id === configImage.links.next.nodeId
-						);
-						if (targetConfigImage) {
-							const targetFilename =
-								targetConfigImage._metadata?.filename ||
-								targetConfigImage.panorama.split("/").pop();
-							const targetImage = imageList.value.find(
-								(img) => img.filename === targetFilename
+				// Import links
+				if (configImage.links && Array.isArray(configImage.links)) {
+					currentImage.links = [];
+					for (const link of configImage.links) {
+						if (link.nodeId) {
+							// Find target image by ID from config
+							const targetConfigImage = config.images.find(
+								(ci) => ci.id === link.nodeId
 							);
-							if (targetImage) {
-								currentImage.nextLink = targetImage.id;
-								importedCount++;
-							}
-						}
-					}
-
-					if (configImage.links.prev?.nodeId) {
-						// Find target image by ID from config
-						const targetConfigImage = config.images.find(
-							(ci) => ci.id === configImage.links.prev.nodeId
-						);
-						if (targetConfigImage) {
-							const targetFilename =
-								targetConfigImage._metadata?.filename ||
-								targetConfigImage.panorama.split("/").pop();
-							const targetImage = imageList.value.find(
-								(img) => img.filename === targetFilename
-							);
-							if (targetImage) {
-								currentImage.previousLink = targetImage.id;
-								importedCount++;
+							if (targetConfigImage) {
+								const targetFilename =
+									targetConfigImage._metadata?.filename ||
+									targetConfigImage.panorama.split("/").pop();
+								const targetImage = imageList.value.find(
+									(img) => img.filename === targetFilename
+								);
+								if (targetImage) {
+									currentImage.links.push({ nodeId: targetImage.id });
+									importedCount++;
+								}
 							}
 						}
 					}
@@ -1833,7 +1771,7 @@ const importConfiguration = async (config) => {
 		updateCompassState();
 
 		// Auto-save the imported configuration
-		saveProgressToStorage();
+		await saveProgressToStorage();
 
 		importProgress.value.percent = 100;
 
@@ -1864,7 +1802,7 @@ const normalizeHeading = (degrees) => {
 	return normalized;
 };
 
-const setNorthDirection = () => {
+const setNorthDirection = async () => {
 	if (!currentNode.value) return;
 
 	// Save current heading as north reference
@@ -1882,10 +1820,10 @@ const setNorthDirection = () => {
 	);
 
 	// Auto-save progress
-	saveProgressToStorage();
+	await saveProgressToStorage();
 };
 
-const clearNorthCalibration = () => {
+const clearNorthCalibration = async () => {
 	if (!currentNode.value) return;
 
 	currentNode.value.northCalibration = null;
@@ -1896,7 +1834,7 @@ const clearNorthCalibration = () => {
 	showStatus("North calibration cleared");
 
 	// Auto-save progress
-	saveProgressToStorage();
+	await saveProgressToStorage();
 };
 
 // Viewer management
@@ -1906,25 +1844,16 @@ const updateViewerNodes = () => {
 	const nodes = imageList.value.map((image) => {
 		const viewerLinks = [];
 
-		// Add next link if set
-		if (image.nextLink) {
-			viewerLinks.push({
-				nodeId: image.nextLink,
-				position: { yaw: "0deg", pitch: "0deg" }, // Front position
-			});
-		}
-
-		// Add previous link if set
-		if (image.previousLink) {
-			viewerLinks.push({
-				nodeId: image.previousLink,
-				position: { yaw: "180deg", pitch: "0deg" }, // Back position
-			});
-		}
-
-		// Add any additional custom links from the old system
+		// Add all links from the links array
 		if (image.links && image.links.length > 0) {
-			viewerLinks.push(...image.links);
+			image.links.forEach((link, index) => {
+				// Distribute links around the panorama
+				const yawDegrees = (360 / image.links.length) * index;
+				viewerLinks.push({
+					nodeId: link.nodeId,
+					position: { yaw: `${yawDegrees}deg`, pitch: "0deg" },
+				});
+			});
 		}
 
 		return {
