@@ -9,26 +9,103 @@
 			>
 				<h3 class="text-lg font-semibold mb-3">360° Image Linker</h3>
 
-				<!-- Directory Selection -->
+				<!-- Project & Directory Selection -->
 				<div class="mb-4">
 					<label class="block text-sm text-gray-300 mb-1"
-						>Image Directory:</label
+						>Project & Section:</label
 					>
 
-					<!-- Directory Selection -->
+					<!-- Project Selection -->
 					<div class="relative mb-2">
 						<select
-							v-model="selectedDirectory"
-							@change="onDirectoryChange(selectedDirectory)"
+							v-model="selectedProject"
+							@change="onProjectChange(selectedProject)"
 							class="w-full px-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
 						>
-							<option value="" disabled>Select directory...</option>
+							<option value="" disabled>Select project...</option>
 							<option
-								v-for="directory in availableDirectories"
-								:key="directory.name"
-								:value="directory.name"
+								v-for="project in availableProjects"
+								:key="project.name"
+								:value="project.name"
 							>
-								{{ directory.name }}
+								{{ project.name }}
+							</option>
+						</select>
+						<div
+							class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
+						>
+							<svg
+								class="w-4 h-4 text-gray-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 9l-7 7-7-7"
+								></path>
+							</svg>
+						</div>
+					</div>
+
+					<!-- Section Selection -->
+					<div
+						v-if="selectedProject && availableSections.length > 0"
+						class="relative mb-2"
+					>
+						<select
+							v-model="selectedSection"
+							@change="onSectionChange(selectedSection)"
+							class="w-full px-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+						>
+							<option value="" disabled>Select section...</option>
+							<option
+								v-for="section in availableSections"
+								:key="section.name"
+								:value="section.name"
+							>
+								{{ section.name }} ({{ section.subSections.length }}
+								subsections)
+							</option>
+						</select>
+						<div
+							class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
+						>
+							<svg
+								class="w-4 h-4 text-gray-400"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 9l-7 7-7-7"
+								></path>
+							</svg>
+						</div>
+					</div>
+
+					<!-- SubSection Selection -->
+					<div
+						v-if="selectedSection && availableSubSections.length > 0"
+						class="relative mb-2"
+					>
+						<select
+							v-model="selectedSubSection"
+							@change="onSubSectionChange(selectedSubSection)"
+							class="w-full px-3 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+						>
+							<option value="" disabled>Select subsection...</option>
+							<option
+								v-for="subSection in availableSubSections"
+								:key="subSection.name"
+								:value="subSection.name"
+							>
+								{{ subSection.name }} ({{ subSection.imageCount }} images)
 							</option>
 						</select>
 						<div
@@ -51,6 +128,20 @@
 					</div>
 
 					<div class="text-xs text-gray-400 mt-2">
+						<span
+							v-if="selectedProject && selectedSection && selectedSubSection"
+						>
+							{{ selectedProject }} / {{ selectedSection }} /
+							{{ selectedSubSection }}
+						</span>
+						<span v-else-if="selectedProject && selectedSection">
+							{{ selectedProject }} / {{ selectedSection }}
+						</span>
+						<span v-else-if="selectedProject">
+							{{ selectedProject }}
+						</span>
+						<span v-else>No project selected</span>
+						<br />
 						{{ imageList.length }} images loaded
 					</div>
 				</div>
@@ -416,12 +507,28 @@
 					>
 						Clear All Links
 					</button>
-					<button
-						@click="exportLinks"
-						class="w-full px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm"
-					>
-						Export Configuration
-					</button>
+					<div class="flex space-x-2">
+						<button
+							@click="exportLinks"
+							class="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm"
+						>
+							Export Configuration
+						</button>
+						<button
+							@click="triggerImportConfig"
+							class="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 rounded text-sm"
+						>
+							Import Configuration
+						</button>
+					</div>
+					<!--  file input for import -->
+					<input
+						ref="importFileInput"
+						type="file"
+						accept=".json"
+						@change="handleImportConfig"
+						class="hidden"
+					/>
 				</div>
 			</div>
 
@@ -531,6 +638,35 @@
 				</div>
 			</div>
 
+			<!-- Import Progress Overlay -->
+			<div
+				v-if="importProgress.show"
+				class="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+			>
+				<div class="bg-white rounded-lg p-6 max-w-md w-80 mx-4">
+					<div class="text-center">
+						<div class="mb-4">
+							<div
+								class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
+							></div>
+						</div>
+						<h3 class="text-lg font-semibold text-gray-900 mb-2">
+							Importing Configuration
+						</h3>
+						<p class="text-gray-600 mb-4">{{ importProgress.message }}</p>
+						<div class="w-full bg-gray-200 rounded-full h-2">
+							<div
+								class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+								:style="{ width: importProgress.percent + '%' }"
+							></div>
+						</div>
+						<p class="text-sm text-gray-500 mt-2">
+							{{ importProgress.percent }}% complete
+						</p>
+					</div>
+				</div>
+			</div>
+
 			<!-- Status Messages -->
 			<div
 				v-if="statusMessage"
@@ -556,6 +692,7 @@ import "@photo-sphere-viewer/virtual-tour-plugin/index.css";
 const viewerContainer = ref();
 const viewer = ref(null);
 const virtualTour = ref(null);
+const importFileInput = ref();
 
 // Image management
 const imageList = ref([]);
@@ -583,9 +720,15 @@ const showLinkDropdown = ref(false);
 const showLinkSelector = ref(false);
 const linkDirection = ref(""); // 'next' or 'previous'
 
-// Directory and image management
-const selectedDirectory = ref("");
-const availableDirectories = ref([]);
+// Project and directory management
+const selectedProject = ref("");
+const selectedSection = ref("");
+const selectedSubSection = ref("");
+const availableProjects = ref([]);
+const availableSections = ref([]);
+const availableSubSections = ref([]);
+const selectedDirectory = ref(""); // Keep for backward compatibility
+const availableDirectories = ref([]); // Keep for backward compatibility
 const BASE_URL = ref("");
 const IMAGE_FILES = ref([]);
 
@@ -594,22 +737,66 @@ const STORAGE_KEY = "panorama-linker-progress";
 const saveProgress = ref(true); // Toggle for auto-save
 const lastSaved = ref(null);
 
-// Load available directories
+// Import progress tracking
+const importProgress = ref({
+	show: false,
+	message: "",
+	percent: 0,
+});
+
+// Load available projects and maintain backward compatibility
 const loadDirectories = async () => {
 	try {
-		const response = await $fetch("/api/images/directories");
-		if (response.success) {
-			availableDirectories.value = response.directories;
-			// Set default directory if available
-			if (availableDirectories.value.length > 0) {
-				const defaultDir =
-					availableDirectories.value.find((dir) =>
-						dir.name.includes("08CintaP_UpperMainDeck_20250624")
-					) || availableDirectories.value[0];
+		// Try new project structure first
+		const projectResponse = await $fetch("/api/projects");
+		if (projectResponse.success && projectResponse.projects.length > 0) {
+			availableProjects.value = projectResponse.projects;
 
-				selectedDirectory.value = defaultDir.name;
-				BASE_URL.value = defaultDir.path;
-				await loadImagesFromDirectory(defaultDir.name);
+			// Set default selections if available
+			if (availableProjects.value.length > 0) {
+				const defaultProject = availableProjects.value[0];
+				selectedProject.value = defaultProject.name;
+
+				if (defaultProject.sections.length > 0) {
+					const defaultSection = defaultProject.sections[0];
+					selectedSection.value = defaultSection.name;
+					availableSections.value = defaultProject.sections;
+
+					if (defaultSection.subSections.length > 0) {
+						const defaultSubSection = defaultSection.subSections[0];
+						selectedSubSection.value = defaultSubSection.name;
+						availableSubSections.value = defaultSection.subSections;
+
+						// Load images from default subsection
+						const directoryPath = `${selectedProject.value}/${selectedSection.value}/${selectedSubSection.value}`;
+						selectedDirectory.value = directoryPath;
+						BASE_URL.value = defaultSubSection.path;
+
+						try {
+							await loadImagesFromDirectory(directoryPath);
+						} catch (error) {
+							console.error("Error loading default images:", error);
+							showStatus(`Failed to load images from ${directoryPath}`);
+						}
+					}
+				}
+			}
+		} else {
+			// Fallback to old directory structure
+			const response = await $fetch("/api/images/directories");
+			if (response.success) {
+				availableDirectories.value = response.directories;
+				// Set default directory if available
+				if (availableDirectories.value.length > 0) {
+					const defaultDir =
+						availableDirectories.value.find((dir) =>
+							dir.name.includes("08CintaP_UpperMainDeck_20250624")
+						) || availableDirectories.value[0];
+
+					selectedDirectory.value = defaultDir.name;
+					BASE_URL.value = defaultDir.path;
+					await loadImagesFromDirectory(defaultDir.name);
+				}
 			}
 		}
 	} catch (error) {
@@ -621,9 +808,23 @@ const loadDirectories = async () => {
 // Load images from selected directory
 const loadImagesFromDirectory = async (directoryName) => {
 	try {
-		const response = await $fetch(`/api/images/${directoryName}`);
+		console.log("Loading images from directory:", directoryName);
+		// For nested paths, we need to handle them differently
+		let apiUrl;
+		if (directoryName.includes("/")) {
+			// Use query parameter for nested paths to avoid URL encoding issues
+			apiUrl = `/api/images/nested?path=${encodeURIComponent(directoryName)}`;
+		} else {
+			// Use regular path for simple directory names
+			apiUrl = `/api/images/${encodeURIComponent(directoryName)}`;
+		}
+		console.log("API URL:", apiUrl);
+		const response = await $fetch(apiUrl);
+		console.log("API response:", response);
+
 		if (response.success) {
-			IMAGE_FILES.value = response.images.map((img) => img.filename);
+			IMAGE_FILES.value = response.images;
+			console.log("IMAGE_FILES loaded:", IMAGE_FILES.value.length, "files");
 			await initializeImages();
 		} else {
 			throw new Error(response.error || "Failed to load images");
@@ -631,6 +832,7 @@ const loadImagesFromDirectory = async (directoryName) => {
 	} catch (error) {
 		console.error("Error loading images from directory:", error);
 		showStatus(`Failed to load images from ${directoryName}`);
+		throw error; // Re-throw to handle in calling function
 	}
 };
 
@@ -644,6 +846,9 @@ const saveProgressToStorage = () => {
 			timestamp: Date.now(),
 			directoryInfo: {
 				selectedDirectory: selectedDirectory.value,
+				selectedProject: selectedProject.value,
+				selectedSection: selectedSection.value,
+				selectedSubSection: selectedSubSection.value,
 				baseUrl: BASE_URL.value,
 			},
 			images: imageList.value.map((img) => ({
@@ -695,13 +900,35 @@ const loadProgressFromStorage = async () => {
 		if (progressData.directoryInfo) {
 			const dirInfo = progressData.directoryInfo;
 
-			// Restore server directory
-			selectedDirectory.value = dirInfo.selectedDirectory;
-			BASE_URL.value = dirInfo.baseUrl;
+			// Check if this is the new nested structure
+			if (
+				dirInfo.selectedProject &&
+				dirInfo.selectedSection &&
+				dirInfo.selectedSubSection
+			) {
+				// Restore nested structure
+				selectedProject.value = dirInfo.selectedProject;
+				selectedSection.value = dirInfo.selectedSection;
+				selectedSubSection.value = dirInfo.selectedSubSection;
+				selectedDirectory.value = dirInfo.selectedDirectory;
+				BASE_URL.value = dirInfo.baseUrl;
 
-			// Load images from server directory
-			if (dirInfo.selectedDirectory) {
-				await loadImagesFromDirectory(dirInfo.selectedDirectory);
+				// Load projects and set up the structure
+				await loadDirectories();
+
+				// Load images from the specific subsection
+				if (dirInfo.selectedDirectory) {
+					await loadImagesFromDirectory(dirInfo.selectedDirectory);
+				}
+			} else {
+				// Restore legacy directory structure
+				selectedDirectory.value = dirInfo.selectedDirectory;
+				BASE_URL.value = dirInfo.baseUrl;
+
+				// Load images from server directory
+				if (dirInfo.selectedDirectory) {
+					await loadImagesFromDirectory(dirInfo.selectedDirectory);
+				}
 			}
 		}
 
@@ -781,7 +1008,104 @@ const hasSavedProgress = () => {
 	}
 };
 
-// Handle directory selection change
+// Handle project selection change
+const onProjectChange = async (projectName) => {
+	if (!projectName) return;
+
+	const project = availableProjects.value.find(
+		(proj) => proj.name === projectName
+	);
+	if (!project) return;
+
+	selectedProject.value = projectName;
+	selectedSection.value = "";
+	selectedSubSection.value = "";
+	availableSections.value = project.sections;
+	availableSubSections.value = [];
+
+	// Clear current data
+	clearCurrentImageData();
+
+	showStatus(`Selected project: ${projectName}`);
+};
+
+// Handle section selection change
+const onSectionChange = async (sectionName) => {
+	if (!sectionName || !selectedProject.value) return;
+
+	const project = availableProjects.value.find(
+		(proj) => proj.name === selectedProject.value
+	);
+	if (!project) return;
+
+	const section = project.sections.find((sec) => sec.name === sectionName);
+	if (!section) return;
+
+	selectedSection.value = sectionName;
+	selectedSubSection.value = "";
+	availableSubSections.value = section.subSections;
+
+	// Clear current data
+	clearCurrentImageData();
+
+	showStatus(`Selected section: ${sectionName}`);
+};
+
+// Handle subsection selection change
+const onSubSectionChange = async (subSectionName) => {
+	if (!subSectionName || !selectedProject.value || !selectedSection.value)
+		return;
+
+	const project = availableProjects.value.find(
+		(proj) => proj.name === selectedProject.value
+	);
+	if (!project) return;
+
+	const section = project.sections.find(
+		(sec) => sec.name === selectedSection.value
+	);
+	if (!section) return;
+
+	const subSection = section.subSections.find(
+		(sub) => sub.name === subSectionName
+	);
+	if (!subSection) return;
+
+	selectedSubSection.value = subSectionName;
+
+	// Set directory path and BASE_URL
+	const directoryPath = `${selectedProject.value}/${selectedSection.value}/${subSectionName}`;
+	selectedDirectory.value = directoryPath;
+	BASE_URL.value = subSection.path;
+
+	// Clear current data
+	clearCurrentImageData();
+
+	// Load new images
+	await loadImagesFromDirectory(directoryPath);
+
+	// Update viewer with new images if viewer is ready
+	if (virtualTour.value && imageList.value.length > 0) {
+		updateViewerNodes();
+	}
+
+	showStatus(
+		`Loaded ${IMAGE_FILES.value.length} images from ${selectedProject.value}/${selectedSection.value}/${subSectionName}`
+	);
+
+	// Auto-save progress after directory change
+	saveProgressToStorage();
+};
+
+// Helper function to clear current image data
+const clearCurrentImageData = () => {
+	imageList.value = [];
+	currentImageIndex.value = 0;
+	currentImageName.value = "";
+	currentNode.value = null;
+};
+
+// Handle directory selection change (for backward compatibility)
 const onDirectoryChange = async (directoryName) => {
 	if (!directoryName) return;
 
@@ -794,16 +1118,15 @@ const onDirectoryChange = async (directoryName) => {
 	BASE_URL.value = directory.path;
 
 	// Clear current data
-	imageList.value = [];
-	currentImageIndex.value = 0;
-	currentImageName.value = "";
-	currentNode.value = null;
+	clearCurrentImageData();
 
 	// Load new images
 	await loadImagesFromDirectory(directoryName);
 
-	// Update viewer with new images
-	updateViewerNodes();
+	// Update viewer with new images if viewer is ready
+	if (virtualTour.value && imageList.value.length > 0) {
+		updateViewerNodes();
+	}
 
 	showStatus(`Loaded ${IMAGE_FILES.value.length} images from ${directoryName}`);
 
@@ -815,11 +1138,11 @@ const onDirectoryChange = async (directoryName) => {
 const initializeImages = async () => {
 	if (IMAGE_FILES.value.length === 0) return;
 
-	const imagePromises = IMAGE_FILES.value.map(async (filename, index) => {
+	const imagePromises = IMAGE_FILES.value.map(async (imageInfo, index) => {
 		const imageData = {
 			id: (index + 1).toString(),
-			filename: filename,
-			panorama: BASE_URL.value + filename,
+			filename: imageInfo.filename,
+			panorama: imageInfo.path,
 			links: [],
 			nextLink: null,
 			previousLink: null,
@@ -829,12 +1152,15 @@ const initializeImages = async () => {
 
 		// Extract GPS coordinates from EXIF data
 		try {
-			const gpsData = await extractGpsFromImage(BASE_URL.value + filename);
+			const gpsData = await extractGpsFromImage(imageInfo.path);
 			if (gpsData) {
 				imageData.gpsCoordinates = gpsData;
 			}
 		} catch (error) {
-			console.warn(`Could not extract GPS data from ${filename}:`, error);
+			console.warn(
+				`Could not extract GPS data from ${imageInfo.filename}:`,
+				error
+			);
 		}
 
 		return imageData;
@@ -846,9 +1172,15 @@ const initializeImages = async () => {
 		currentImageName.value = imageList.value[0].filename;
 		currentNode.value = imageList.value[0];
 		updateCompassState();
+
+		// Update viewer nodes if viewer is ready
+		if (virtualTour.value) {
+			updateViewerNodes();
+		}
 	}
 };
 
+// return all images except the current image
 const availableForDirectionalLink = computed(() => {
 	if (!currentNode.value) return imageList.value;
 
@@ -1095,7 +1427,12 @@ const previousImage = () => {
 // ------------- GPS extraction -------------
 const extractGpsFromImage = async (imageUrl) => {
 	try {
-		const gpsData = await gps(imageUrl);
+		const response = await fetch(imageUrl);
+		if (!response.ok) {
+			throw new Error(`Failed to fetch image: ${response.statusText}`);
+		}
+		const blob = await response.blob();
+		const gpsData = await gps(blob);
 
 		if (
 			gpsData &&
@@ -1201,6 +1538,10 @@ const exportLinks = () => {
 				_metadata: {
 					filename: img.filename,
 					northCalibration: img.northCalibration,
+					project: selectedProject.value,
+					section: selectedSection.value,
+					subSection: selectedSubSection.value,
+					directoryPath: selectedDirectory.value,
 				},
 			};
 		}),
@@ -1218,6 +1559,247 @@ const exportLinks = () => {
 	URL.revokeObjectURL(url);
 
 	showStatus("Configuration exported in tour format");
+};
+
+// ------------- Import configuration functions -------------
+const triggerImportConfig = () => {
+	importFileInput.value?.click();
+};
+
+const handleImportConfig = async (event) => {
+	const file = event.target.files?.[0];
+	if (!file) return;
+
+	try {
+		// Show progress overlay
+		importProgress.value.show = true;
+		importProgress.value.message = "Loading configuration file...";
+		importProgress.value.percent = 10;
+
+		const text = await file.text();
+		const config = JSON.parse(text);
+
+		importProgress.value.message = "Parsing configuration...";
+		importProgress.value.percent = 20;
+
+		await importConfiguration(config);
+
+		// Clear the file input
+		event.target.value = "";
+	} catch (error) {
+		console.error("Error importing configuration:", error);
+		showStatus("Failed to import configuration: " + error.message);
+	} finally {
+		// Hide progress overlay
+		importProgress.value.show = false;
+		importProgress.value.percent = 0;
+		importProgress.value.message = "";
+	}
+};
+
+const importConfiguration = async (config) => {
+	try {
+		// Validate the configuration format
+		if (!config.images || !Array.isArray(config.images)) {
+			throw new Error("Invalid configuration format: missing images array");
+		}
+
+		importProgress.value.message = "Validating configuration...";
+		importProgress.value.percent = 30;
+
+		// Check if we need to switch directories first
+		if (
+			config.directoryName &&
+			config.directoryName !== selectedDirectory.value
+		) {
+			importProgress.value.message = `Switching to directory: ${config.directoryName}`;
+			importProgress.value.percent = 40;
+
+			// Try to find and load the matching directory
+			if (config.directoryName.includes("/")) {
+				// Handle nested directory structure
+				const pathParts = config.directoryName.split("/");
+				if (pathParts.length >= 3) {
+					const [project, section, subSection] = pathParts;
+
+					// Find matching project
+					const matchingProject = availableProjects.value.find(
+						(p) => p.name === project
+					);
+					if (matchingProject) {
+						importProgress.value.message = `Loading project: ${project}`;
+						await onProjectChange(project);
+
+						// Find matching section
+						const matchingSection = matchingProject.sections.find(
+							(s) => s.name === section
+						);
+						if (matchingSection) {
+							importProgress.value.message = `Loading section: ${section}`;
+							await onSectionChange(section);
+
+							// Find matching subsection
+							const matchingSubSection = matchingSection.subSections.find(
+								(s) => s.name === subSection
+							);
+							if (matchingSubSection) {
+								importProgress.value.message = `Loading subsection: ${subSection}`;
+								await onSubSectionChange(subSection);
+							} else {
+								throw new Error(
+									`SubSection '${subSection}' not found in project structure`
+								);
+							}
+						} else {
+							throw new Error(
+								`Section '${section}' not found in project structure`
+							);
+						}
+					} else {
+						throw new Error(
+							`Project '${project}' not found in available projects`
+						);
+					}
+				}
+			} else {
+				// Handle legacy directory structure
+				const matchingDir = availableDirectories.value.find(
+					(d) => d.name === config.directoryName
+				);
+				if (matchingDir) {
+					await onDirectoryChange(config.directoryName);
+				} else {
+					throw new Error(
+						`Directory '${config.directoryName}' not found in available directories`
+					);
+				}
+			}
+
+			importProgress.value.message = "Loading images...";
+			importProgress.value.percent = 60;
+
+			// Wait a bit for the directory change to complete
+			await new Promise((resolve) => setTimeout(resolve, 500));
+		}
+
+		// Validate that we have matching images
+		if (imageList.value.length === 0) {
+			throw new Error("No images loaded in current directory");
+		}
+
+		importProgress.value.message = "Restoring links and calibrations...";
+		importProgress.value.percent = 70;
+
+		// Import links and calibrations
+		let importedCount = 0;
+		let calibrationCount = 0;
+		const totalImages = config.images.length;
+		let processedImages = 0;
+
+		// Process images with progress updates
+		for (const configImage of config.images) {
+			// Find matching image by filename (more reliable than ID)
+			const filename =
+				configImage._metadata?.filename ||
+				configImage.panorama.split("/").pop();
+			const currentImage = imageList.value.find(
+				(img) => img.filename === filename
+			);
+
+			if (currentImage) {
+				// Import next/prev links
+				if (configImage.links) {
+					if (configImage.links.next?.nodeId) {
+						// Find target image by ID from config
+						const targetConfigImage = config.images.find(
+							(ci) => ci.id === configImage.links.next.nodeId
+						);
+						if (targetConfigImage) {
+							const targetFilename =
+								targetConfigImage._metadata?.filename ||
+								targetConfigImage.panorama.split("/").pop();
+							const targetImage = imageList.value.find(
+								(img) => img.filename === targetFilename
+							);
+							if (targetImage) {
+								currentImage.nextLink = targetImage.id;
+								importedCount++;
+							}
+						}
+					}
+
+					if (configImage.links.prev?.nodeId) {
+						// Find target image by ID from config
+						const targetConfigImage = config.images.find(
+							(ci) => ci.id === configImage.links.prev.nodeId
+						);
+						if (targetConfigImage) {
+							const targetFilename =
+								targetConfigImage._metadata?.filename ||
+								targetConfigImage.panorama.split("/").pop();
+							const targetImage = imageList.value.find(
+								(img) => img.filename === targetFilename
+							);
+							if (targetImage) {
+								currentImage.previousLink = targetImage.id;
+								importedCount++;
+							}
+						}
+					}
+				}
+
+				// Import north calibration
+				if (configImage._metadata?.northCalibration) {
+					currentImage.northCalibration = {
+						heading: configImage._metadata.northCalibration.heading,
+						isSet: configImage._metadata.northCalibration.isSet,
+					};
+					calibrationCount++;
+				} else if (
+					configImage.panoData?.poseHeading &&
+					configImage.panoData.poseHeading !== 0
+				) {
+					// Fallback: use poseHeading if available
+					currentImage.northCalibration = {
+						heading: configImage.panoData.poseHeading,
+						isSet: true,
+					};
+					calibrationCount++;
+				}
+			}
+
+			// Update progress
+			processedImages++;
+			const progressPercent =
+				70 + Math.round((processedImages / totalImages) * 20);
+			importProgress.value.percent = progressPercent;
+			importProgress.value.message = `Processing image ${processedImages}/${totalImages}...`;
+
+			// Small delay to show progress updates
+			if (processedImages % 3 === 0) {
+				await new Promise((resolve) => setTimeout(resolve, 50));
+			}
+		}
+
+		importProgress.value.message = "Updating viewer...";
+		importProgress.value.percent = 95;
+
+		// Update viewer and UI state
+		updateViewerNodes();
+		updateCompassState();
+
+		// Auto-save the imported configuration
+		saveProgressToStorage();
+
+		importProgress.value.percent = 100;
+
+		showStatus(
+			`Configuration imported successfully! ${importedCount} links and ${calibrationCount} north calibrations restored.`
+		);
+	} catch (error) {
+		console.error("Error importing configuration:", error);
+		throw error;
+	}
 };
 
 // ------------- Compass/North calibration functions -------------
@@ -1249,8 +1831,6 @@ const setNorthDirection = () => {
 
 	isNorthCalibrated.value = true;
 
-	// Compass is now a UI overlay, no need to update viewer markers
-
 	showStatus(
 		`North direction set at ${Math.round(
 			currentHeading.value
@@ -1277,7 +1857,7 @@ const clearNorthCalibration = () => {
 
 // Viewer management
 const updateViewerNodes = () => {
-	if (!virtualTour.value) return;
+	if (!virtualTour.value || imageList.value.length === 0) return;
 
 	const nodes = imageList.value.map((image) => {
 		const viewerLinks = [];
@@ -1314,30 +1894,9 @@ const updateViewerNodes = () => {
 	virtualTour.value.setNodes(nodes, currentNode.value?.id || "1");
 };
 
-// Initialize on mount
-onMounted(async () => {
-	// Load directories first
-	await loadDirectories();
-
-	// Try to restore saved progress
-	if (hasSavedProgress()) {
-		await loadProgressFromStorage();
-	}
-
-	// Add click-outside handler to close dropdowns
-	const handleClickOutside = (event) => {
-		const searchContainer = event.target.closest(".relative");
-		if (!searchContainer) {
-			showSearchDropdown.value = false;
-			showLinkDropdown.value = false;
-		}
-	};
-	document.addEventListener("click", handleClickOutside);
-
-	// Cleanup on unmount
-	onUnmounted(() => {
-		document.removeEventListener("click", handleClickOutside);
-	});
+// Initialize viewer after images are loaded
+const initializeViewer = () => {
+	if (!viewerContainer.value) return;
 
 	viewer.value = new Viewer({
 		container: viewerContainer.value,
@@ -1374,9 +1933,50 @@ onMounted(async () => {
 		currentHeading.value = normalizeHeading(yawDegrees);
 	});
 
-	// Set initial nodes and compass state
-	updateViewerNodes();
-	updateCompassState();
+	// Set initial nodes and compass state only if we have images
+	if (imageList.value.length > 0) {
+		updateViewerNodes();
+		updateCompassState();
+	}
+};
+
+// Initialize on mount
+onMounted(async () => {
+	// Add click-outside handler to close dropdowns
+	const handleClickOutside = (event) => {
+		const searchContainer = event.target.closest(".relative");
+		if (!searchContainer) {
+			showSearchDropdown.value = false;
+			showLinkDropdown.value = false;
+		}
+	};
+	document.addEventListener("click", handleClickOutside);
+
+	// Initialize viewer first (without nodes)
+	initializeViewer();
+
+	// Load directories and images
+	try {
+		await loadDirectories();
+
+		// Try to restore saved progress
+		if (hasSavedProgress()) {
+			await loadProgressFromStorage();
+		}
+	} catch (error) {
+		console.error("Error during initialization:", error);
+		showStatus("Failed to initialize viewer");
+	}
+});
+
+// Cleanup on unmount - moved outside of async onMounted
+onUnmounted(() => {
+	if (typeof document !== "undefined") {
+		const existingHandler = document.querySelector(".relative");
+		if (existingHandler) {
+			document.removeEventListener("click", () => {});
+		}
+	}
 });
 </script>
 
