@@ -9,6 +9,9 @@ export default defineEventHandler(async (event) => {
 			throw new Error("Directory name is required");
 		}
 
+		console.log("Processing simple directory:", directoryName);
+
+		// For simple directory names (legacy support)
 		const directoryPath = join(
 			process.cwd(),
 			"public",
@@ -38,6 +41,10 @@ export default defineEventHandler(async (event) => {
 				path: `/images/${directoryName}/${entry.name}`,
 			}))
 			.sort((a, b) => a.filename.localeCompare(b.filename));
+
+		console.log(
+			`Found ${images.length} images in simple directory ${directoryName}`
+		);
 
 		return {
 			directory: directoryName,
