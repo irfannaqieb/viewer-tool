@@ -1484,18 +1484,63 @@ const showStatus = (message) => {
 };
 
 const clearAllLinks = () => {
-	imageList.value.forEach((image) => {
-		image.links = [];
-		image.nextLink = null;
-		image.previousLink = null;
-		image.northCalibration = null;
-	});
+	let projectInfo = "";
+	if (
+		selectedProject.value &&
+		selectedSection.value &&
+		selectedSubSection.value
+	) {
+		projectInfo = `${selectedProject.value} / ${selectedSection.value} / ${selectedSubSection.value}`;
+	} else if (selectedProject.value && selectedSection.value) {
+		projectInfo = `${selectedProject.value} / ${selectedSection.value}`;
+	} else if (selectedProject.value) {
+		projectInfo = selectedProject.value;
+	} else if (selectedDirectory.value) {
+		projectInfo = selectedDirectory.value;
+	} else {
+		projectInfo = "current project";
+	}
 
-	// Update compass state
-	updateCompassState();
+	// Count existing links for the warning
+	const linkCount = imageList.value.reduce((count, image) => {
+		let imageLinks = 0;
+		if (image.nextLink) imageLinks++;
+		if (image.previousLink) imageLinks++;
+		if (image.links && image.links.length > 0) imageLinks += image.links.length;
+		return count + imageLinks;
+	}, 0);
 
-	updateViewerNodes();
-	showStatus("Cleared all links and compass calibrations");
+	const calibrationCount = imageList.value.filter(
+		(image) => image.northCalibration?.isSet
+	).length;
+
+	// Create confirmation message
+	let confirmMessage = `This will permanently remove ALL navigation links and compass calibrations from ${projectInfo}.\n\n`;
+	confirmMessage += `• ${linkCount} navigation links will be deleted\n`;
+	confirmMessage += `• ${calibrationCount} compass calibrations will be deleted\n`;
+	confirmMessage += `• ${imageList.value.length} images will be affected\n\n`;
+	confirmMessage +=
+		"This action cannot be undone. Are you sure you want to continue?";
+
+	// Show confirmation dialog
+	if (confirm(confirmMessage)) {
+		// User confirmed, proceed with clearing
+		imageList.value.forEach((image) => {
+			image.links = [];
+			image.nextLink = null;
+			image.previousLink = null;
+			image.northCalibration = null;
+		});
+
+		updateCompassState();
+		updateViewerNodes();
+		showStatus(
+			`Cleared all links and compass calibrations from ${projectInfo}`
+		);
+		saveProgressToStorage();
+	} else {
+		showStatus("Clear operation cancelled");
+	}
 };
 
 const exportLinks = () => {
