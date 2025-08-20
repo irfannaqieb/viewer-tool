@@ -1577,7 +1577,7 @@ const exportLinks = () => {
 				id: img.id,
 				panorama: BASE_URL.value + img.filename,
 				gps: gps,
-				panoData: { poseHeading: poseHeading },
+				sphereCorrection: { pan: poseHeading, tilt: 0, roll: 0 },
 				links: Object.keys(links).length > 0 ? links : {},
 				// Keep metadata for reference
 				_metadata: {
@@ -1801,12 +1801,11 @@ const importConfiguration = async (config) => {
 					};
 					calibrationCount++;
 				} else if (
-					configImage.panoData?.poseHeading &&
-					configImage.panoData.poseHeading !== 0
+					configImage.sphereCorrection?.pan &&
+					configImage.sphereCorrection.pan !== 0
 				) {
-					// Fallback: use poseHeading if available
 					currentImage.northCalibration = {
-						heading: configImage.panoData.poseHeading,
+						heading: configImage.sphereCorrection.pan,
 						isSet: true,
 					};
 					calibrationCount++;
