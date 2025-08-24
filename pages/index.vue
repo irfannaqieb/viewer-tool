@@ -463,15 +463,13 @@
 						</button>
 						<button
 							@click="loadProgressFromStorage"
-							:disabled="!hasSavedProgress()"
-							class="flex-1 px-2 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded text-xs"
+							class="flex-1 px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs"
 						>
 							📁 Restore
 						</button>
 						<button
 							@click="clearSavedProgress"
-							:disabled="!hasSavedProgress()"
-							class="flex-1 px-2 py-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 rounded text-xs"
+							class="flex-1 px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs"
 						>
 							🗑️ Clear
 						</button>
@@ -670,7 +668,6 @@
 import { Viewer } from "@photo-sphere-viewer/core";
 import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
 import { VirtualTourPlugin } from "@photo-sphere-viewer/virtual-tour-plugin";
-import { gps } from "exifr";
 
 import "@photo-sphere-viewer/core/index.css";
 import "@photo-sphere-viewer/markers-plugin/index.css";
@@ -823,169 +820,140 @@ const loadImagesFromDirectory = async (directoryName) => {
 	}
 };
 
-// save progress to localStorage and JSON file
-const saveProgressToStorage = async () => {
-	if (!saveProgress.value) return;
+// save current image progress individually
+const saveCurrentImageProgress = async (triggerType = "auto") => {
+	if (!saveProgress.value || !currentNode.value) return;
 
 	try {
-		const progressData = {
-			version: "1.0",
-			timestamp: Date.now(),
-			directoryInfo: {
-				selectedDirectory: selectedDirectory.value,
-				selectedProject: selectedProject.value,
-				selectedSection: selectedSection.value,
-				selectedSubSection: selectedSubSection.value,
-				baseUrl: BASE_URL.value,
-			},
-			images: imageList.value.map((img) => ({
-				id: img.id,
-				filename: img.filename,
-				links: img.links,
-				northCalibration: img.northCalibration,
-				gpsCoordinates: img.gpsCoordinates,
-			})),
-			currentImage: {
-				index: currentImageIndex.value,
-				name: currentImageName.value,
-				nodeId: currentNode.value?.id || null,
-			},
-			ui: {
-				showCompassOverlay: showCompassOverlay.value,
-			},
+		// Get current project path
+		const projectPath =
+			selectedDirectory.value ||
+			`${selectedProject.value}/${selectedSection.value}/${selectedSubSection.value}`;
+
+		if (!projectPath) {
+			console.warn("No project path available for saving");
+			return;
+		}
+
+		const imageData = {
+			imageId: currentNode.value.id,
+			filename: currentNode.value.filename,
+			projectPath: projectPath,
+			links: currentNode.value.links || [],
+			northCalibration: currentNode.value.northCalibration,
+			gpsCoordinates: currentNode.value.gpsCoordinates,
 		};
 
-		// Save to localStorage
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
-
-		// Save to JSON file
+		// Save current image to individual file
 		try {
-			await $fetch("/api/save-progress", {
+			const response = await $fetch("/api/save-image-progress", {
 				method: "POST",
-				body: { progressData },
+				body: { imageData },
 			});
+
+			if (response.success) {
+				lastSaved.value = new Date().toLocaleTimeString();
+
+				if (triggerType === "manual") {
+					showStatus(`Image saved: ${currentNode.value.filename}`);
+				}
+			}
 		} catch (fileError) {
-			console.error("Error saving to file:", fileError);
-			// Don't throw - localStorage save was successful
-			if (arguments[0] === "manual") {
-				showStatus(
-					"Progress saved to localStorage, but failed to save to file"
-				);
-				return;
+			console.error("Error saving image to file:", fileError);
+			if (triggerType === "manual") {
+				showStatus("Failed to save image progress");
 			}
 		}
-
-		lastSaved.value = new Date().toLocaleTimeString();
-
-		if (arguments[0] === "manual") {
-			showStatus("Progress saved successfully to localStorage and file");
-		}
 	} catch (error) {
-		console.error("Error saving progress:", error);
-		showStatus("Failed to save progress");
+		console.error("Error saving current image progress:", error);
+		if (triggerType === "manual") {
+			showStatus("Failed to save image progress");
+		}
 	}
 };
 
-// Load progress from localStorage
-const loadProgressFromStorage = async () => {
+// Legacy function name for compatibility - now saves current image only
+const saveProgressToStorage = async (triggerType = "auto") => {
+	await saveCurrentImageProgress(triggerType);
+};
+
+// Load project progress from individual image files
+const loadProjectProgress = async () => {
 	try {
-		const savedData = localStorage.getItem(STORAGE_KEY);
-		if (!savedData) return false;
+		// Get current project path
+		const projectPath =
+			selectedDirectory.value ||
+			`${selectedProject.value}/${selectedSection.value}/${selectedSubSection.value}`;
 
-		const progressData = JSON.parse(savedData);
-
-		// Check version compatibility
-		if (!progressData.version || progressData.version !== "1.0") {
-			console.warn("Saved progress version mismatch, skipping restore");
+		if (!projectPath || imageList.value.length === 0) {
+			console.warn("No project path or images available for loading progress");
 			return false;
 		}
 
-		// Restore directory info
-		if (progressData.directoryInfo) {
-			const dirInfo = progressData.directoryInfo;
+		// Load all saved images for this project
+		const response = await $fetch(
+			`/api/load-project-progress?projectPath=${encodeURIComponent(
+				projectPath
+			)}`
+		);
 
-			// Check if this is the new nested structure
-			if (
-				dirInfo.selectedProject &&
-				dirInfo.selectedSection &&
-				dirInfo.selectedSubSection
-			) {
-				// Restore nested structure
-				selectedProject.value = dirInfo.selectedProject;
-				selectedSection.value = dirInfo.selectedSection;
-				selectedSubSection.value = dirInfo.selectedSubSection;
-				selectedDirectory.value = dirInfo.selectedDirectory;
-				BASE_URL.value = dirInfo.baseUrl;
+		if (!response.success) {
+			console.log("No saved progress found for project:", projectPath);
+			return false;
+		}
 
-				// Load projects and set up the structure
-				await loadDirectories();
-
-				// Load images from the specific subsection
-				if (dirInfo.selectedDirectory) {
-					await loadImagesFromDirectory(dirInfo.selectedDirectory);
-				}
-			} else {
-				// Restore legacy directory structure
-				selectedDirectory.value = dirInfo.selectedDirectory;
-				BASE_URL.value = dirInfo.baseUrl;
-
-				// Load images from server directory
-				if (dirInfo.selectedDirectory) {
-					await loadImagesFromDirectory(dirInfo.selectedDirectory);
-				}
-			}
+		if (response.images.length === 0) {
+			console.log("No saved images found for project:", projectPath);
+			return false;
 		}
 
 		// Restore image data (links, calibrations, etc.)
-		if (progressData.images && imageList.value.length > 0) {
-			progressData.images.forEach((savedImg) => {
-				const currentImg = imageList.value.find(
-					(img) => img.filename === savedImg.filename || img.id === savedImg.id
-				);
+		let restoredCount = 0;
+		response.images.forEach((savedImg) => {
+			const currentImg = imageList.value.find(
+				(img) =>
+					img.filename === savedImg.filename || img.id === savedImg.imageId
+			);
 
-				if (currentImg) {
-					// Restore links and calibrations
-					currentImg.links = savedImg.links || [];
-					currentImg.northCalibration = savedImg.northCalibration;
-					// Don't override GPS coordinates from EXIF, but restore if none found
-					if (!currentImg.gpsCoordinates && savedImg.gpsCoordinates) {
-						currentImg.gpsCoordinates = savedImg.gpsCoordinates;
-					}
+			if (currentImg) {
+				// Restore links and calibrations
+				currentImg.links = savedImg.links || [];
+				currentImg.northCalibration = savedImg.northCalibration;
+				// Don't override GPS coordinates from EXIF, but restore if none found
+				if (!currentImg.gpsCoordinates && savedImg.gpsCoordinates) {
+					currentImg.gpsCoordinates = savedImg.gpsCoordinates;
 				}
-			});
-
-			// Update viewer with restored links
-			updateViewerNodes();
-		}
-
-		// Restore current image
-		if (progressData.currentImage && imageList.value.length > 0) {
-			const currentImg = progressData.currentImage;
-			if (currentImg.nodeId) {
-				// Try to navigate to the same image by ID or filename
-				const targetImage = imageList.value.find(
-					(img) =>
-						img.id === currentImg.nodeId || img.filename === currentImg.name
-				);
-				if (targetImage) {
-					navigateToImage(targetImage.id);
-				}
+				restoredCount++;
 			}
+		});
+
+		// Update viewer with restored links
+		updateViewerNodes();
+
+		// Update last saved time based on most recent save
+		const mostRecentSave = response.images.reduce((latest, img) => {
+			const imgTime = new Date(img.lastModified).getTime();
+			return imgTime > latest ? imgTime : latest;
+		}, 0);
+
+		if (mostRecentSave > 0) {
+			lastSaved.value = new Date(mostRecentSave).toLocaleTimeString();
 		}
 
-		// Restore UI state
-		if (progressData.ui) {
-			showCompassOverlay.value = progressData.ui.showCompassOverlay ?? true;
-		}
-
-		lastSaved.value = new Date(progressData.timestamp).toLocaleTimeString();
-		showStatus(`Progress restored from ${lastSaved.value}`);
+		showStatus(
+			`Progress restored: ${restoredCount} images from ${response.loadedCount} saved files`
+		);
 		return true;
 	} catch (error) {
-		console.error("Error loading progress:", error);
+		console.error("Error loading project progress:", error);
 		showStatus("Failed to load saved progress");
 		return false;
 	}
+};
+
+// Legacy function for compatibility - now loads project progress
+const loadProgressFromStorage = async () => {
+	return await loadProjectProgress();
 };
 
 // Clear saved progress
@@ -1000,11 +968,21 @@ const clearSavedProgress = () => {
 	}
 };
 
-// Check if there's saved progress
-const hasSavedProgress = () => {
+// Check if there's saved progress for current project
+const hasSavedProgress = async () => {
 	try {
-		const savedData = localStorage.getItem(STORAGE_KEY);
-		return !!savedData;
+		const projectPath =
+			selectedDirectory.value ||
+			`${selectedProject.value}/${selectedSection.value}/${selectedSubSection.value}`;
+
+		if (!projectPath) return false;
+
+		const response = await $fetch(
+			`/api/load-project-progress?projectPath=${encodeURIComponent(
+				projectPath
+			)}`
+		);
+		return response.success && response.images.length > 0;
 	} catch {
 		return false;
 	}
@@ -1150,17 +1128,19 @@ const initializeImages = async () => {
 			gpsCoordinates: null, // { latitude: number, longitude: number, altitude?: number }
 		};
 
-		// Extract GPS coordinates from EXIF data
-		try {
-			const gpsData = await extractGpsFromImage(imageInfo.path);
-			if (gpsData) {
-				imageData.gpsCoordinates = gpsData;
-			}
-		} catch (error) {
-			console.warn(
-				`Could not extract GPS data from ${imageInfo.filename}:`,
-				error
-			);
+		// Use server-provided GPS if available (no client-side image fetch)
+		if (
+			imageInfo.gps &&
+			imageInfo.gps.latitude !== undefined &&
+			imageInfo.gps.longitude !== undefined
+		) {
+			imageData.gpsCoordinates = {
+				latitude: imageInfo.gps.latitude,
+				longitude: imageInfo.gps.longitude,
+				...(imageInfo.gps.altitude !== undefined
+					? { altitude: imageInfo.gps.altitude }
+					: {}),
+			};
 		}
 
 		return imageData;
@@ -1347,7 +1327,12 @@ const removeLink = async (targetImageId) => {
 };
 
 // ------------- Navigation -------------
-const navigateToImage = (imageId) => {
+const navigateToImage = async (imageId) => {
+	// Auto-save current image before navigating away
+	if (currentNode.value && saveProgress.value) {
+		await saveCurrentImageProgress("auto");
+	}
+
 	const imageIndex = imageList.value.findIndex((img) => img.id === imageId);
 	if (imageIndex !== -1) {
 		currentImageIndex.value = imageIndex;
@@ -1370,64 +1355,36 @@ const navigateToImage = (imageId) => {
 	}
 };
 
-const nextImage = () => {
+const nextImage = async () => {
 	// Navigate to first linked image if available, otherwise sequential
 	if (currentNode.value?.links?.length > 0) {
-		navigateToImage(currentNode.value.links[0].nodeId);
+		await navigateToImage(currentNode.value.links[0].nodeId);
 	} else {
 		// Fallback to sequential navigation
 		if (currentImageIndex.value < imageList.value.length - 1) {
-			navigateToImage(imageList.value[currentImageIndex.value + 1].id);
+			await navigateToImage(imageList.value[currentImageIndex.value + 1].id);
 		} else {
-			navigateToImage(imageList.value[0].id); // Loop to first
+			await navigateToImage(imageList.value[0].id); // Loop to first
 		}
 	}
 };
 
-const previousImage = () => {
+const previousImage = async () => {
 	// Navigate to last linked image if available, otherwise sequential
 	if (currentNode.value?.links?.length > 0) {
 		const lastLinkIndex = currentNode.value.links.length - 1;
-		navigateToImage(currentNode.value.links[lastLinkIndex].nodeId);
+		await navigateToImage(currentNode.value.links[lastLinkIndex].nodeId);
 	} else {
 		// Fallback to sequential navigation
 		if (currentImageIndex.value > 0) {
-			navigateToImage(imageList.value[currentImageIndex.value - 1].id);
+			await navigateToImage(imageList.value[currentImageIndex.value - 1].id);
 		} else {
-			navigateToImage(imageList.value[imageList.value.length - 1].id); // Loop to last
+			await navigateToImage(imageList.value[imageList.value.length - 1].id); // Loop to last
 		}
 	}
 };
 
-// ------------- GPS extraction -------------
-const extractGpsFromImage = async (imageUrl) => {
-	try {
-		const response = await fetch(imageUrl);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch image: ${response.statusText}`);
-		}
-		const blob = await response.blob();
-		const gpsData = await gps(blob);
-
-		if (
-			gpsData &&
-			gpsData.latitude !== undefined &&
-			gpsData.longitude !== undefined
-		) {
-			const result = {
-				latitude: gpsData.latitude,
-				longitude: gpsData.longitude,
-			};
-
-			return result;
-		}
-
-		return null;
-	} catch (error) {
-		console.warn(`Error extracting GPS from ${imageUrl}:`, error);
-		return null;
-	}
-};
+// (Client-side EXIF extraction removed; GPS now provided by server.)
 
 // Format GPS coordinates (for display)
 const formatGpsCoordinates = (coords) => {
@@ -1942,8 +1899,10 @@ onMounted(async () => {
 		await loadDirectories();
 
 		// Try to restore saved progress
-		if (hasSavedProgress()) {
+		try {
 			await loadProgressFromStorage();
+		} catch (progressError) {
+			console.warn("Could not load saved progress:", progressError);
 		}
 	} catch (error) {
 		console.error("Error during initialization:", error);
