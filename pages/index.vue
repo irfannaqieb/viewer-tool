@@ -720,6 +720,7 @@ const IMAGE_FILES = ref([]);
 const STORAGE_KEY = "panorama-linker-progress";
 const saveProgress = ref(true); // Toggle for auto-save
 const lastSaved = ref(null);
+const isSaving = ref(false);
 
 // Import progress tracking
 const importProgress = ref({
@@ -1328,9 +1329,31 @@ const removeLink = async (targetImageId) => {
 
 // ------------- Navigation -------------
 const navigateToImage = async (imageId) => {
+	// Prevent concurrent navigation operations
+	if (isSaving.value) {
+		console.warn("Navigation blocked: Save operation in progress");
+		showStatus("Navigation blocked: Please wait for save to complete");
+		return;
+	}
+
 	// Auto-save current image before navigating away
 	if (currentNode.value && saveProgress.value) {
-		await saveCurrentImageProgress("auto");
+		isSaving.value = true; // set lock
+		try {
+			await saveCurrentImageProgress("auto");
+			console.log("Auto-save completed successfully before navigation");
+		} catch (error) {
+			console.error("Auto-save failed before navigation:", error);
+			showStatus(
+				"Failed to save progress before navigation. Please try again."
+			);
+
+			// Don't proceed with navigation on save failure
+			isSaving.value = false;
+			return;
+		} finally {
+			isSaving.value = false;
+		}
 	}
 
 	const imageIndex = imageList.value.findIndex((img) => img.id === imageId);
