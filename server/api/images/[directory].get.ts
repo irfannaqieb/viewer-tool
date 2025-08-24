@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import { join } from "path";
+import exifr from "exifr";
 
 export default defineEventHandler(async (event) => {
 	try {
@@ -30,17 +31,51 @@ export default defineEventHandler(async (event) => {
 
 		// Filter image files (jpg, jpeg, png, webp)
 		const imageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
-		const images = entries
+		const imageEntries = entries
 			.filter(
 				(entry) =>
 					entry.isFile() &&
 					imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext))
 			)
-			.map((entry) => ({
-				filename: entry.name,
-				path: `/images/${directoryName}/${entry.name}`,
-			}))
-			.sort((a, b) => a.filename.localeCompare(b.filename));
+			.sort((a, b) => a.name.localeCompare(b.name));
+
+		const images = await Promise.all(
+			imageEntries.map(async (entry) => {
+				const imagePath = `/images/${directoryName}/${entry.name}`;
+
+				let gps: {
+					latitude: number;
+					longitude: number;
+					altitude?: number;
+				} | null = null;
+				try {
+					const filePath = join(directoryPath, entry.name);
+					const buffer = await fs.readFile(filePath);
+					const gpsData = await exifr.gps(buffer);
+					if (
+						gpsData &&
+						(gpsData as any).latitude !== undefined &&
+						(gpsData as any).longitude !== undefined
+					) {
+						gps = {
+							latitude: (gpsData as any).latitude as number,
+							longitude: (gpsData as any).longitude as number,
+							...((gpsData as any).altitude !== undefined
+								? { altitude: (gpsData as any).altitude as number }
+								: {}),
+						};
+					}
+				} catch (ex) {
+					console.warn(`GPS extraction failed for ${entry.name}:`, ex);
+				}
+
+				return {
+					filename: entry.name,
+					path: imagePath,
+					gps,
+				};
+			})
+		);
 
 		console.log(
 			`Found ${images.length} images in simple directory ${directoryName}`

@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import { join } from "path";
+import exifr from "exifr";
 
 export default defineEventHandler(async (event) => {
 	try {
@@ -52,13 +53,16 @@ export default defineEventHandler(async (event) => {
 
 		// Filter image files (jpg, jpeg, png, webp)
 		const imageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
-		const images = entries
+		const imageEntries = entries
 			.filter(
 				(entry) =>
 					entry.isFile() &&
 					imageExtensions.some((ext) => entry.name.toLowerCase().endsWith(ext))
 			)
-			.map((entry) => {
+			.sort((a, b) => a.name.localeCompare(b.name));
+
+		const images = await Promise.all(
+			imageEntries.map(async (entry) => {
 				let imagePath: string;
 				if (pathParts.length === 3) {
 					// New nested structure
@@ -68,12 +72,41 @@ export default defineEventHandler(async (event) => {
 					imagePath = `/images/${directoryPath}/${entry.name}`;
 				}
 
+				// Attempt to extract GPS on the server
+				let gps: {
+					latitude: number;
+					longitude: number;
+					altitude?: number;
+				} | null = null;
+				try {
+					const filePath = join(fullDirectoryPath, entry.name);
+					const buffer = await fs.readFile(filePath);
+					const gpsData = await exifr.gps(buffer);
+					if (
+						gpsData &&
+						(gpsData as any).latitude !== undefined &&
+						(gpsData as any).longitude !== undefined
+					) {
+						gps = {
+							latitude: (gpsData as any).latitude as number,
+							longitude: (gpsData as any).longitude as number,
+							...((gpsData as any).altitude !== undefined
+								? { altitude: (gpsData as any).altitude as number }
+								: {}),
+						};
+					}
+				} catch (ex) {
+					// Non-fatal: just skip GPS if it fails
+					console.warn(`GPS extraction failed for ${entry.name}:`, ex);
+				}
+
 				return {
 					filename: entry.name,
 					path: imagePath,
+					gps,
 				};
 			})
-			.sort((a, b) => a.filename.localeCompare(b.filename));
+		);
 
 		console.log(`Found ${images.length} images in ${directoryPath}`);
 
