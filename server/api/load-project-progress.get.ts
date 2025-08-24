@@ -6,14 +6,29 @@ export default defineEventHandler(async (event) => {
 	try {
 		const query = getQuery(event);
 
+		// Handle undefined projectPath
 		if (!query.projectPath) {
 			throw createError({
 				statusCode: 400,
-				statusMessage: "projectPath is required",
+				statusMessage: "projectPath query parameter is required",
 			});
 		}
 
-		const { projectPath } = query as { projectPath: string };
+		// Normalize projectPath: handle string, string[], or other types
+		let projectPath: string;
+		if (Array.isArray(query.projectPath)) {
+			projectPath = query.projectPath[0]?.toString().trim();
+		} else {
+			projectPath = query.projectPath?.toString().trim();
+		}
+
+		// Validate projectPath is not empty after trimming
+		if (!projectPath) {
+			throw createError({
+				statusCode: 400,
+				statusMessage: "projectPath query parameter cannot be empty",
+			});
+		}
 
 		// Build directory path
 		const publicDir = join(process.cwd(), "public");
@@ -78,6 +93,17 @@ export default defineEventHandler(async (event) => {
 			errors: loadErrors.length > 0 ? loadErrors : undefined,
 		};
 	} catch (error) {
+		// Check if this is already an HTTP error (has numeric statusCode)
+		if (
+			error &&
+			typeof error === "object" &&
+			"statusCode" in error &&
+			typeof error.statusCode === "number"
+		) {
+			throw error;
+		}
+
+		// For other errors, log and throw a 500 error
 		console.error("Error loading project progress:", error);
 
 		throw createError({

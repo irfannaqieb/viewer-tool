@@ -1,5 +1,5 @@
 import { readFile } from "fs/promises";
-import { join } from "path";
+import { join, resolve, relative } from "path";
 import { existsSync } from "fs";
 
 export default defineEventHandler(async (event) => {
@@ -24,9 +24,17 @@ export default defineEventHandler(async (event) => {
 		const progressDir = join(publicDir, "progress");
 		const projectDir = join(progressDir, projectPath.replace(/[\/\\]/g, "_"));
 
-		const safeFilename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-		const fileName = `img_${imageId}_${safeFilename}.json`;
-		const filePath = join(projectDir, fileName);
+		const safeImageId = String(imageId).replace(/[^a-zA-Z0-9_-]/g, "_");
+		const safeFilename = String(filename).replace(/[^a-zA-Z0-9._-]/g, "_");
+		const fileName = `img_${safeImageId}_${safeFilename}.json`;
+		const filePath = resolve(projectDir, fileName);
+		const rel = relative(projectDir, filePath);
+		if (rel.startsWith("..")) {
+			throw createError({
+				statusCode: 400,
+				statusMessage: "Invalid path components",
+			});
+		}
 
 		// Check if file exists
 		if (!existsSync(filePath)) {

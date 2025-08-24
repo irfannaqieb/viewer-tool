@@ -1,5 +1,5 @@
 import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
+import { join, resolve, relative } from "path";
 import { existsSync } from "fs";
 
 export default defineEventHandler(async (event) => {
@@ -39,10 +39,24 @@ export default defineEventHandler(async (event) => {
 			await mkdir(projectDir, { recursive: true });
 		}
 
-		// Create filename: img_{imageId}_{filename}.json
-		const safeFilename = imageData.filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-		const fileName = `img_${imageData.imageId}_${safeFilename}.json`;
-		const filePath = join(projectDir, fileName);
+		// Create filename: img_{imageId}_{filename}.json (sanitized and contained)
+		const safeImageId = String(imageData.imageId).replace(
+			/[^a-zA-Z0-9_-]/g,
+			"_"
+		);
+		const safeFilename = String(imageData.filename).replace(
+			/[^a-zA-Z0-9._-]/g,
+			"_"
+		);
+		const fileName = `img_${safeImageId}_${safeFilename}.json`;
+		const filePath = resolve(projectDir, fileName);
+		const rel = relative(projectDir, filePath);
+		if (rel.startsWith("..")) {
+			throw createError({
+				statusCode: 400,
+				statusMessage: "Invalid path components",
+			});
+		}
 
 		// Prepare save data with metadata
 		const saveData = {
