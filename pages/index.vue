@@ -1365,6 +1365,19 @@ const navigateToImage = async (imageId) => {
 		// Update compass state for new image
 		updateCompassState();
 
+		if (imageList.value.length > 50 && !isTargetInCurrentWindow(imageIndex)) {
+			console.log(
+				`Navigating outside current window, updating virtual tour for image ${imageIndex}`
+			);
+			showStatus(
+				`Loading nearby images... (${Math.max(0, imageIndex - 25)}-${Math.min(
+					imageList.value.length - 1,
+					imageIndex + 25
+				)})`
+			);
+			updateViewerNodes();
+		}
+
 		// Update viewer
 		if (virtualTour.value) {
 			virtualTour.value.setCurrentNode(imageId);
@@ -1407,7 +1420,16 @@ const previousImage = async () => {
 	}
 };
 
-// (Client-side EXIF extraction removed; GPS now provided by server.)
+// Check if navigation target is within current virtual tour window
+const isTargetInCurrentWindow = (targetIndex) => {
+	if (imageList.value.length <= 50) return true; // All nodes are loaded
+
+	const currentIndex = currentImageIndex.value;
+	const startIndex = Math.max(0, currentIndex - 25);
+	const endIndex = Math.min(imageList.value.length - 1, currentIndex + 25);
+
+	return targetIndex >= startIndex && targetIndex <= endIndex;
+};
 
 // Format GPS coordinates (for display)
 const formatGpsCoordinates = (coords) => {
@@ -1826,11 +1848,29 @@ const clearNorthCalibration = async () => {
 	await saveProgressToStorage();
 };
 
-// Viewer management
+// Viewer management - Optimized for large image sets
 const updateViewerNodes = () => {
 	if (!virtualTour.value || imageList.value.length === 0) return;
 
-	const nodes = imageList.value.map((image) => {
+	// For large datasets, create a smaller subset of nodes around current image
+	const currentIndex = currentImageIndex.value;
+	const totalImages = imageList.value.length;
+
+	let nodesToCreate;
+	if (totalImages > 50) {
+		// For large datasets, only create nodes for nearby images
+		const startIndex = Math.max(0, currentIndex - 25);
+		const endIndex = Math.min(totalImages - 1, currentIndex + 25);
+		nodesToCreate = imageList.value.slice(startIndex, endIndex + 1);
+		console.log(
+			`Creating optimized virtual tour with ${nodesToCreate.length} nodes (${startIndex}-${endIndex}) out of ${totalImages} total images`
+		);
+	} else {
+		// For smaller datasets, create all nodes
+		nodesToCreate = imageList.value;
+	}
+
+	const nodes = nodesToCreate.map((image) => {
 		const viewerLinks = [];
 
 		// Add all links from the links array
@@ -1899,6 +1939,13 @@ const initializeViewer = () => {
 	if (imageList.value.length > 0) {
 		updateViewerNodes();
 		updateCompassState();
+
+		// Show optimization message for large datasets
+		if (imageList.value.length > 50) {
+			showStatus(
+				`Optimized virtual tour loaded with ${imageList.value.length} images`
+			);
+		}
 	}
 };
 
