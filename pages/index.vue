@@ -143,6 +143,56 @@
 						<span v-else>No project selected</span>
 						<br />
 						{{ imageList.length }} images loaded
+						<span v-if="compressionStats.compressedCount > 0" class="text-green-400">
+							({{ compressionStats.compressedCount }} compressed)
+						</span>
+					</div>
+				</div>
+
+				<!-- Image Compression Controls -->
+				<div v-if="selectedDirectory" class="mb-4 p-2 bg-gray-800 rounded">
+					<div class="flex items-center justify-between mb-2">
+						<span class="text-sm font-medium text-gray-300">Image Quality:</span>
+						<div class="flex items-center">
+							<span class="text-xs text-gray-400 mr-2">
+								{{ useCompressedImages ? 'Compressed' : 'Original' }}
+							</span>
+							<button
+								@click="toggleImageMode()"
+								:class="[
+									'w-10 h-5 rounded-full transition-colors duration-200',
+									useCompressedImages ? 'bg-green-600' : 'bg-gray-600'
+								]"
+							>
+								<div
+									:class="[
+										'w-4 h-4 bg-white rounded-full transition-transform duration-200',
+										useCompressedImages ? 'translate-x-5' : 'translate-x-0'
+									]"
+								></div>
+							</button>
+						</div>
+					</div>
+					
+					<div class="space-y-2">
+						<button
+							@click="compressImages"
+							:disabled="isCompressing || !selectedDirectory"
+							class="w-full px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
+						>
+							<span v-if="isCompressing">
+								Compressing... {{ compressionProgress.percent }}%
+							</span>
+							<span v-else>Compress Images</span>
+						</button>
+						
+						<div v-if="compressionStats.total > 0" class="text-xs text-gray-400">
+							{{ compressionStats.compressedCount }}/{{ compressionStats.total }} compressed
+							<br>
+							<span v-if="compressionStats.totalSavings > 0" class="text-green-400">
+								~{{ compressionStats.totalSavings.toFixed(1) }}% size reduction
+							</span>
+						</div>
 					</div>
 				</div>
 
@@ -653,6 +703,35 @@
 				</div>
 			</div>
 
+			<!-- Compression Progress Overlay -->
+			<div
+				v-if="compressionProgress.show"
+				class="absolute inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+			>
+				<div class="bg-white rounded-lg p-6 max-w-md w-80 mx-4">
+					<div class="text-center">
+						<div class="mb-4">
+							<div
+								class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"
+							></div>
+						</div>
+						<h3 class="text-lg font-semibold text-gray-900 mb-2">
+							Compressing Images
+						</h3>
+						<p class="text-gray-600 mb-4">{{ compressionProgress.message }}</p>
+						<div class="w-full bg-gray-200 rounded-full h-2">
+							<div
+								class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+								:style="{ width: compressionProgress.percent + '%' }"
+							></div>
+						</div>
+						<p class="text-sm text-gray-500 mt-2">
+							{{ compressionProgress.percent }}% complete
+						</p>
+					</div>
+				</div>
+			</div>
+
 			<!-- Status Messages -->
 			<div
 				v-if="statusMessage"
@@ -729,6 +808,20 @@ const importProgress = ref({
 	percent: 0,
 });
 
+// Image compression
+const useCompressedImages = ref(false);
+const isCompressing = ref(false);
+const compressionProgress = ref({
+	show: false,
+	message: "",
+	percent: 0,
+});
+const compressionStats = ref({
+	total: 0,
+	compressedCount: 0,
+	totalSavings: 0,
+});
+
 // Load available projects and maintain backward compatibility
 const loadDirectories = async () => {
 	try {
@@ -794,14 +887,16 @@ const loadDirectories = async () => {
 const loadImagesFromDirectory = async (directoryName) => {
 	try {
 		console.log("Loading images from directory:", directoryName);
+		console.log("useCompressedImages.value:", useCompressedImages.value);
+		
 		// For nested paths, we need to handle them differently
 		let apiUrl;
 		if (directoryName.includes("/")) {
 			// Use query parameter for nested paths to avoid URL encoding issues
-			apiUrl = `/api/images/nested?path=${encodeURIComponent(directoryName)}`;
+			apiUrl = `/api/images/nested?path=${encodeURIComponent(directoryName)}&compressed=${useCompressedImages.value}`;
 		} else {
 			// Use regular path for simple directory names
-			apiUrl = `/api/images/${encodeURIComponent(directoryName)}`;
+			apiUrl = `/api/images/${encodeURIComponent(directoryName)}?compressed=${useCompressedImages.value}`;
 		}
 		console.log("API URL:", apiUrl);
 		const response = await $fetch(apiUrl);
@@ -810,6 +905,11 @@ const loadImagesFromDirectory = async (directoryName) => {
 		if (response.success) {
 			IMAGE_FILES.value = response.images;
 			console.log("IMAGE_FILES loaded:", IMAGE_FILES.value.length, "files");
+			console.log("First few images:", IMAGE_FILES.value.slice(0, 3));
+			
+			// Update compression stats
+			updateCompressionStats();
+			
 			await initializeImages();
 		} else {
 			throw new Error(response.error || "Failed to load images");
@@ -838,7 +938,9 @@ const saveCurrentImageProgress = async (triggerType = "auto") => {
 
 		const imageData = {
 			imageId: currentNode.value.id,
-			filename: currentNode.value.filename,
+			filename: currentNode.value.originalFilename || currentNode.value.filename, // Use original filename for progress mapping
+			actualFilename: currentNode.value.filename, // Keep actual filename for reference
+			isCompressed: currentNode.value.isCompressed || false,
 			projectPath: projectPath,
 			links: currentNode.value.links || [],
 			northCalibration: currentNode.value.northCalibration,
@@ -911,10 +1013,15 @@ const loadProjectProgress = async () => {
 		// Restore image data (links, calibrations, etc.)
 		let restoredCount = 0;
 		response.images.forEach((savedImg) => {
-			const currentImg = imageList.value.find(
-				(img) =>
-					img.filename === savedImg.filename || img.id === savedImg.imageId
-			);
+			// Find image by original filename (saved progress uses original filenames)
+			const currentImg = imageList.value.find((img) => {
+				// First try to match by original filename (for compressed images)
+				if (img.originalFilename && img.originalFilename === savedImg.filename) {
+					return true;
+				}
+				// Fallback to current filename or ID for backward compatibility
+				return img.filename === savedImg.filename || img.id === savedImg.imageId;
+			});
 
 			if (currentImg) {
 				// Restore links and calibrations
@@ -1123,6 +1230,8 @@ const initializeImages = async () => {
 		const imageData = {
 			id: (index + 1).toString(),
 			filename: imageInfo.filename,
+			originalFilename: imageInfo.originalFilename || imageInfo.filename, // For mapping compressed back to original
+			isCompressed: imageInfo.isCompressed || false,
 			panorama: imageInfo.path,
 			links: [], // Array of {nodeId: string} objects
 			northCalibration: null, // { heading: number, isSet: boolean }
@@ -1358,14 +1467,17 @@ const navigateToImage = async (imageId) => {
 
 	const imageIndex = imageList.value.findIndex((img) => img.id === imageId);
 	if (imageIndex !== -1) {
+		const wasOutsideWindow =
+			imageList.value.length > 50 && !isTargetInCurrentWindow(imageIndex);
+
 		currentImageIndex.value = imageIndex;
 		currentImageName.value = imageList.value[imageIndex].filename;
-		currentNode.value = imageList.value[imageIndex];
 
 		// Update compass state for new image
 		updateCompassState();
 
-		if (imageList.value.length > 50 && !isTargetInCurrentWindow(imageIndex)) {
+		// Only update viewer nodes if we're moving outside the current window
+		if (wasOutsideWindow) {
 			console.log(
 				`Navigating outside current window, updating virtual tour for image ${imageIndex}`
 			);
@@ -1375,12 +1487,18 @@ const navigateToImage = async (imageId) => {
 					imageIndex + 25
 				)})`
 			);
-			updateViewerNodes();
-		}
 
-		// Update viewer
-		if (virtualTour.value) {
-			virtualTour.value.setCurrentNode(imageId);
+			// Update currentNode AFTER the virtual tour is updated
+			setTimeout(() => {
+				currentNode.value = imageList.value[imageIndex];
+				updateViewerNodes();
+			}, 0);
+		} else {
+			// For navigation within current window, update currentNode and switch nodes
+			currentNode.value = imageList.value[imageIndex];
+			if (virtualTour.value) {
+				virtualTour.value.setCurrentNode(imageId);
+			}
 		}
 
 		// Clear search and close dropdowns
@@ -1392,31 +1510,54 @@ const navigateToImage = async (imageId) => {
 };
 
 const nextImage = async () => {
-	// Navigate to first linked image if available, otherwise sequential
-	if (currentNode.value?.links?.length > 0) {
-		await navigateToImage(currentNode.value.links[0].nodeId);
+	// Simple sequential navigation through directory
+	// Edge case handling
+	if (!imageList.value || imageList.value.length === 0) {
+		console.warn("nextImage: No images available for navigation");
+		return;
+	}
+
+	// Ensure current index is valid
+	if (
+		currentImageIndex.value < 0 ||
+		currentImageIndex.value >= imageList.value.length
+	) {
+		console.warn(
+			`nextImage: Invalid current index ${currentImageIndex.value}, resetting to 0`
+		);
+		currentImageIndex.value = 0;
+	}
+
+	if (currentImageIndex.value < imageList.value.length - 1) {
+		await navigateToImage(imageList.value[currentImageIndex.value + 1].id);
 	} else {
-		// Fallback to sequential navigation
-		if (currentImageIndex.value < imageList.value.length - 1) {
-			await navigateToImage(imageList.value[currentImageIndex.value + 1].id);
-		} else {
-			await navigateToImage(imageList.value[0].id); // Loop to first
-		}
+		await navigateToImage(imageList.value[0].id); // Loop to first
 	}
 };
 
 const previousImage = async () => {
-	// Navigate to last linked image if available, otherwise sequential
-	if (currentNode.value?.links?.length > 0) {
-		const lastLinkIndex = currentNode.value.links.length - 1;
-		await navigateToImage(currentNode.value.links[lastLinkIndex].nodeId);
+	// Simple sequential navigation through directory
+	// Edge case handling
+	if (!imageList.value || imageList.value.length === 0) {
+		console.warn("previousImage: No images available for navigation");
+		return;
+	}
+
+	// Ensure current index is valid
+	if (
+		currentImageIndex.value < 0 ||
+		currentImageIndex.value >= imageList.value.length
+	) {
+		console.warn(
+			`previousImage: Invalid current index ${currentImageIndex.value}, resetting to 0`
+		);
+		currentImageIndex.value = 0;
+	}
+
+	if (currentImageIndex.value > 0) {
+		await navigateToImage(imageList.value[currentImageIndex.value - 1].id);
 	} else {
-		// Fallback to sequential navigation
-		if (currentImageIndex.value > 0) {
-			await navigateToImage(imageList.value[currentImageIndex.value - 1].id);
-		} else {
-			await navigateToImage(imageList.value[imageList.value.length - 1].id); // Loop to last
-		}
+		await navigateToImage(imageList.value[imageList.value.length - 1].id); // Loop to last
 	}
 };
 
@@ -1425,8 +1566,10 @@ const isTargetInCurrentWindow = (targetIndex) => {
 	if (imageList.value.length <= 50) return true; // All nodes are loaded
 
 	const currentIndex = currentImageIndex.value;
-	const startIndex = Math.max(0, currentIndex - 25);
-	const endIndex = Math.min(imageList.value.length - 1, currentIndex + 25);
+	const totalImages = imageList.value.length;
+	const windowSize = totalImages > 200 ? 15 : 25;
+	const startIndex = Math.max(0, currentIndex - windowSize);
+	const endIndex = Math.min(totalImages - 1, currentIndex + windowSize);
 
 	return targetIndex >= startIndex && targetIndex <= endIndex;
 };
@@ -1569,6 +1712,96 @@ const exportLinks = () => {
 	URL.revokeObjectURL(url);
 
 	showStatus("Configuration exported in tour format");
+};
+
+// ------------- Image Compression functions -------------
+const updateCompressionStats = () => {
+	if (!IMAGE_FILES.value || IMAGE_FILES.value.length === 0) {
+		compressionStats.value = { total: 0, compressedCount: 0, totalSavings: 0 };
+		return;
+	}
+
+	const total = IMAGE_FILES.value.length;
+	const compressedCount = IMAGE_FILES.value.filter(img => img.isCompressed).length;
+	
+	compressionStats.value = {
+		total,
+		compressedCount,
+		totalSavings: 0 // Will be updated after compression
+	};
+};
+
+const compressImages = async () => {
+	if (!selectedDirectory.value || isCompressing.value) return;
+
+	try {
+		isCompressing.value = true;
+		compressionProgress.value = { show: true, message: "Starting compression...", percent: 0 };
+
+		const response = await $fetch("/api/compress-images", {
+			method: "POST",
+			body: {
+				directoryPath: selectedDirectory.value,
+				quality: 80,
+				width: 4096
+			}
+		});
+
+		if (response.success) {
+			compressionProgress.value.message = "Compression completed!";
+			compressionProgress.value.percent = 100;
+			
+			// Update stats
+			compressionStats.value = {
+				total: response.total,
+				compressedCount: response.results.filter(r => r.status === "compressed" || r.status === "already_exists").length,
+				totalSavings: response.summary.totalSavings
+			};
+
+			showStatus(`Compressed ${response.processed} images. ${response.summary.totalSavings.toFixed(1)}% size reduction.`);
+			
+			// Auto-switch to compressed mode if compression was successful
+			if (response.summary.totalSavings > 0) {
+				setTimeout(async () => {
+					await toggleImageMode(true);
+				}, 1000);
+			}
+		} else {
+			throw new Error(response.error || "Compression failed");
+		}
+	} catch (error) {
+		console.error("Error compressing images:", error);
+		showStatus("Failed to compress images: " + error.message);
+	} finally {
+		isCompressing.value = false;
+		setTimeout(() => {
+			compressionProgress.value.show = false;
+		}, 2000);
+	}
+};
+
+const toggleImageMode = async (forceCompressed = null) => {
+	if (!selectedDirectory.value) return;
+
+	try {
+		const newMode = forceCompressed !== null ? forceCompressed : !useCompressedImages.value;
+		console.log("Toggling image mode from", useCompressedImages.value, "to", newMode);
+		useCompressedImages.value = newMode;
+
+		// Reload images with the new compression setting
+		console.log("Reloading images with compression:", newMode);
+		await loadImagesFromDirectory(selectedDirectory.value);
+
+		// Update viewer if it's initialized
+		if (virtualTour.value && imageList.value.length > 0) {
+			updateViewerNodes();
+		}
+
+		showStatus(`Switched to ${newMode ? 'compressed' : 'original'} images`);
+	} catch (error) {
+		console.error("Error toggling image mode:", error);
+		showStatus("Failed to switch image mode");
+	}
 };
 
 // ------------- Import configuration functions -------------
@@ -1856,33 +2089,77 @@ const updateViewerNodes = () => {
 	const currentIndex = currentImageIndex.value;
 	const totalImages = imageList.value.length;
 
-	let nodesToCreate;
+	let nodesToCreate, startIndex;
 	if (totalImages > 50) {
-		// For large datasets, only create nodes for nearby images
-		const startIndex = Math.max(0, currentIndex - 25);
-		const endIndex = Math.min(totalImages - 1, currentIndex + 25);
+		// For very large datasets, use smaller window to improve performance
+		const windowSize = totalImages > 200 ? 15 : 25;
+		startIndex = Math.max(0, currentIndex - windowSize);
+		const endIndex = Math.min(totalImages - 1, currentIndex + windowSize);
 		nodesToCreate = imageList.value.slice(startIndex, endIndex + 1);
 		console.log(
-			`Creating optimized virtual tour with ${nodesToCreate.length} nodes (${startIndex}-${endIndex}) out of ${totalImages} total images`
+			`Creating optimized virtual tour with ${nodesToCreate.length} nodes (${startIndex}-${endIndex}) out of ${totalImages} total images (window size: ${windowSize})`
 		);
 	} else {
 		// For smaller datasets, create all nodes
+		startIndex = 0;
 		nodesToCreate = imageList.value;
 	}
 
-	const nodes = nodesToCreate.map((image) => {
+	const nodes = nodesToCreate.map((image, index) => {
 		const viewerLinks = [];
+		const actualImageIndex = startIndex + index;
 
-		// Add all links from the links array
+		// Add user-created links from the links array (only if target exists in current window)
 		if (image.links && image.links.length > 0) {
-			image.links.forEach((link, index) => {
-				// Distribute links around the panorama
-				const yawDegrees = (360 / image.links.length) * index;
-				viewerLinks.push({
-					nodeId: link.nodeId,
-					position: { yaw: `${yawDegrees}deg`, pitch: "0deg" },
-				});
+			image.links.forEach((link, linkIndex) => {
+				// Check if the target node exists in current window
+				const targetExists = nodesToCreate.some(
+					(node) => node.id === link.nodeId
+				);
+				if (targetExists) {
+					// Distribute user links around the panorama
+					const yawDegrees = (360 / image.links.length) * linkIndex;
+					viewerLinks.push({
+						nodeId: link.nodeId,
+						position: { yaw: `${yawDegrees}deg`, pitch: "0deg" },
+					});
+				}
 			});
+		}
+
+		// Add sequential navigation links for better UX (only for smaller datasets)
+		if (totalImages > 1 && totalImages <= 50) {
+			// Add previous image link (at 180° - left side)
+			if (actualImageIndex > 0) {
+				const prevImage = imageList.value[actualImageIndex - 1];
+				// Only add if not already in user links
+				const existingLink = viewerLinks.find(
+					(link) => link.nodeId === prevImage.id
+				);
+
+				if (!existingLink) {
+					viewerLinks.push({
+						nodeId: prevImage.id,
+						position: { yaw: "180deg", pitch: "0deg" }, // Left side
+					});
+				}
+			}
+
+			// Add next image link (at 0° - front)
+			if (actualImageIndex < totalImages - 1) {
+				const nextImage = imageList.value[actualImageIndex + 1];
+				// Only add if not already in user links
+				const existingLink = viewerLinks.find(
+					(link) => link.nodeId === nextImage.id
+				);
+
+				if (!existingLink) {
+					viewerLinks.push({
+						nodeId: nextImage.id,
+						position: { yaw: "0deg", pitch: "0deg" }, // Front
+					});
+				}
+			}
 		}
 
 		return {
@@ -1893,7 +2170,14 @@ const updateViewerNodes = () => {
 		};
 	});
 
-	virtualTour.value.setNodes(nodes, currentNode.value?.id || "1");
+	// Set current node to the first node in the current window if current node doesn't exist in it
+	const currentNodeId = currentNode.value?.id;
+	const currentNodeExists = nodesToCreate.some(
+		(node) => node.id === currentNodeId
+	);
+	const nodeToSet = currentNodeExists ? currentNodeId : nodes[0]?.id || "1";
+
+	virtualTour.value.setNodes(nodes, nodeToSet);
 };
 
 // Initialize viewer after images are loaded
