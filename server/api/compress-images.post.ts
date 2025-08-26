@@ -82,7 +82,9 @@ export default defineEventHandler(async (event) => {
           const originalSize = originalStats.size;
           const compressedSize = compressedStats.size;
           const savings =
-            ((originalSize - compressedSize) / originalSize) * 100;
+            originalSize === 0
+              ? 0
+              : ((originalSize - compressedSize) / originalSize) * 100;
 
           compressionResults.push({
             original: entry.name,
@@ -124,7 +126,10 @@ export default defineEventHandler(async (event) => {
         // Get compressed file size
         const compressedStats = await fs.stat(compressedPath);
         const compressedSize = compressedStats.size;
-        const savings = ((originalSize - compressedSize) / originalSize) * 100;
+        const savings =
+          originalSize === 0
+            ? 0
+            : ((originalSize - compressedSize) / originalSize) * 100;
 
         console.log(
           `Compressed: ${entry.name} -> ${compressedName} (${(
