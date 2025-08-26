@@ -1,5 +1,5 @@
 import { promises as fs } from "fs";
-import { join } from "path";
+import { join, resolve, sep } from "path";
 import exifr from "exifr";
 
 export default defineEventHandler(async (event) => {
@@ -20,20 +20,20 @@ export default defineEventHandler(async (event) => {
       useCompressed
     );
 
-    const directoryPath = join(
-      process.cwd(),
-      "public",
-      "images",
-      directoryName
-    );
+    const baseDir = resolve(process.cwd(), "public", "images");
+    const requestedPath = resolve(baseDir, directoryName);
+
+    if (requestedPath !== baseDir && !requestedPath.startsWith(baseDir + sep)) {
+      throw new Error("Directory not found");
+    }
 
     try {
-      await fs.access(directoryPath);
+      await fs.access(requestedPath);
     } catch {
       throw new Error("Directory not found");
     }
 
-    const entries = await fs.readdir(directoryPath, { withFileTypes: true });
+    const entries = await fs.readdir(requestedPath, { withFileTypes: true });
 
     // Filter image files (jpg, jpeg, png, webp)
     const imageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
@@ -104,8 +104,8 @@ export default defineEventHandler(async (event) => {
         try {
           // For compressed images, read GPS from the original file
           const filePathForGPS = entry.isCompressed
-            ? join(directoryPath, entry.originalName)
-            : join(directoryPath, entry.name);
+            ? join(requestedPath, entry.originalName)
+            : join(requestedPath, entry.name);
 
           const buffer = await fs.readFile(filePathForGPS);
           const gpsData = await exifr.gps(buffer);
