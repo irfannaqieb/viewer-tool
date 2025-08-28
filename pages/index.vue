@@ -143,14 +143,13 @@
             <span v-else>No project selected</span>
             <br />
             <span v-if="isFiltered">
-              {{ imageList.length }} of {{ originalImageList.length }} images shown
+              {{ imageList.length }} of {{ originalImageList.length }} images
+              shown
               <span class="text-orange-400">
                 ({{ hiddenImageIndices.length }} hidden)
               </span>
             </span>
-            <span v-else>
-              {{ imageList.length }} images loaded
-            </span>
+            <span v-else> {{ imageList.length }} images loaded </span>
             <span
               v-if="compressionStats.compressedCount > 0"
               class="text-green-400"
@@ -273,8 +272,12 @@
               {{ imageList.length }} total images
               <br />
               <span class="text-gray-500">
-                ~{{ Math.floor((imageList.length - 1) / 6) + 1 }} would be shown, 
-                ~{{ imageList.length - (Math.floor((imageList.length - 1) / 6) + 1) }} hidden
+                ~{{ Math.floor((imageList.length - 1) / 6) + 1 }} would be
+                shown, ~{{
+                  imageList.length -
+                  (Math.floor((imageList.length - 1) / 6) + 1)
+                }}
+                hidden
               </span>
             </div>
           </div>
@@ -440,7 +443,10 @@
             </div>
 
             <!-- List of current links -->
-            <div v-if="currentNodeWithLinks?.links?.length > 0" class="space-y-1">
+            <div
+              v-if="currentNodeWithLinks?.links?.length > 0"
+              class="space-y-1"
+            >
               <div
                 v-for="(link, index) in currentNodeWithLinks.links"
                 :key="index"
@@ -459,7 +465,13 @@
                   <span class="text-white text-xs break-all leading-tight">
                     {{ getImageNameById(link.nodeId) }}
                   </span>
-                  <span v-if="isFiltered && !imageList.find(img => img.id === link.nodeId)" class="text-orange-400 text-xs ml-1">
+                  <span
+                    v-if="
+                      isFiltered &&
+                      !imageList.find((img) => img.id === link.nodeId)
+                    "
+                    class="text-orange-400 text-xs ml-1"
+                  >
                     (hidden)
                   </span>
                 </div>
@@ -919,13 +931,15 @@ const hiddenImageIndices = ref([]);
 // Computed property to get current node with up-to-date links
 const currentNodeWithLinks = computed(() => {
   if (!currentNode.value) return null;
-  
+
   // If we're filtered, get the node from originalImageList to ensure we have all links
   if (isFiltered.value) {
-    const originalNode = originalImageList.value.find(img => img.id === currentNode.value.id);
+    const originalNode = originalImageList.value.find(
+      (img) => img.id === currentNode.value.id
+    );
     return originalNode || currentNode.value;
   }
-  
+
   return currentNode.value;
 });
 
@@ -1081,6 +1095,68 @@ const saveCurrentImageProgress = async (triggerType = "auto") => {
     }
   } catch (error) {
     console.error("Error saving current image progress:", error);
+    if (triggerType === "manual") {
+      showStatus("Failed to save image progress");
+    }
+  }
+};
+
+// Save multiple images (for bidirectional link operations)
+const saveMultipleImageProgress = async (imageIds, triggerType = "auto") => {
+  if (!saveProgress.value || !imageIds || imageIds.length === 0) return;
+
+  try {
+    // Get current project path
+    const projectPath =
+      selectedDirectory.value ||
+      `${selectedProject.value}/${selectedSection.value}/${selectedSubSection.value}`;
+
+    if (!projectPath) {
+      console.warn("No project path available for saving");
+      return;
+    }
+
+    // Find all images to save
+    const searchList = isFiltered.value ? originalImageList.value : imageList.value;
+    const imagesToSave = searchList.filter(img => imageIds.includes(img.id));
+
+    // Save each image
+    const savePromises = imagesToSave.map(async (image) => {
+      const imageData = {
+        imageId: image.id,
+        filename: image.originalFilename || image.filename,
+        actualFilename: image.filename,
+        isCompressed: image.isCompressed || false,
+        projectPath: projectPath,
+        links: image.links || [],
+        northCalibration: image.northCalibration,
+        gpsCoordinates: image.gpsCoordinates,
+      };
+
+      try {
+        const response = await $fetch("/api/save-image-progress", {
+          method: "POST",
+          body: { imageData },
+        });
+        return response.success;
+      } catch (error) {
+        console.error(`Error saving image ${image.id}:`, error);
+        return false;
+      }
+    });
+
+    const results = await Promise.all(savePromises);
+    const successCount = results.filter(success => success).length;
+
+    if (successCount > 0) {
+      lastSaved.value = new Date().toLocaleTimeString();
+      if (triggerType === "manual") {
+        showStatus(`Saved ${successCount} image(s)`);
+      }
+    }
+
+  } catch (error) {
+    console.error("Error saving multiple images:", error);
     if (triggerType === "manual") {
       showStatus("Failed to save image progress");
     }
@@ -1397,15 +1473,20 @@ const availableForLink = computed(() => {
   if (!currentNodeWithLinks.value) return imageList.value;
 
   // Get already linked image IDs from current image
-  const linkedIds = (currentNodeWithLinks.value.links || []).map((link) => link.nodeId);
+  const linkedIds = (currentNodeWithLinks.value.links || []).map(
+    (link) => link.nodeId
+  );
 
   // When filtered, we should show all images (including hidden ones) as potential link targets
   // But exclude current image and already linked images
-  const sourceList = isFiltered.value ? originalImageList.value : imageList.value;
-  
+  const sourceList = isFiltered.value
+    ? originalImageList.value
+    : imageList.value;
+
   return sourceList.filter(
     (image) =>
-      image.id !== currentNodeWithLinks.value?.id && !linkedIds.includes(image.id)
+      image.id !== currentNodeWithLinks.value?.id &&
+      !linkedIds.includes(image.id)
   );
 });
 
@@ -1430,10 +1511,14 @@ const handleLinkSearch = () => {
   }
 
   // Get already linked image IDs
-  const linkedIds = (currentNodeWithLinks.value?.links || []).map((link) => link.nodeId);
+  const linkedIds = (currentNodeWithLinks.value?.links || []).map(
+    (link) => link.nodeId
+  );
 
   // When filtered, search in all images (including hidden ones) for linking
-  const searchList = isFiltered.value ? originalImageList.value : imageList.value;
+  const searchList = isFiltered.value
+    ? originalImageList.value
+    : imageList.value;
 
   // Exclude current image and already linked images
   linkSearchResults.value = searchList
@@ -1487,8 +1572,10 @@ const addLink = async (targetImageId) => {
   if (!currentNodeWithLinks.value) return;
 
   // When filtered, we need to find images in the original list
-  const searchList = isFiltered.value ? originalImageList.value : imageList.value;
-  
+  const searchList = isFiltered.value
+    ? originalImageList.value
+    : imageList.value;
+
   const currentImage = searchList.find(
     (img) => img.id === currentNodeWithLinks.value.id
   );
@@ -1519,7 +1606,9 @@ const addLink = async (targetImageId) => {
 
   // If we're filtered, also update the corresponding image in the filtered list
   if (isFiltered.value) {
-    const currentFilteredImage = imageList.value.find(img => img.id === currentNodeWithLinks.value.id);
+    const currentFilteredImage = imageList.value.find(
+      (img) => img.id === currentNodeWithLinks.value.id
+    );
     if (currentFilteredImage && currentFilteredImage !== currentImage) {
       currentFilteredImage.links = [...currentImage.links]; // Create new array to trigger reactivity
     }
@@ -1533,16 +1622,18 @@ const addLink = async (targetImageId) => {
   updateViewerNodes();
   closeLinkSelector();
 
-  // Auto-save progress
-  await saveProgressToStorage();
+  // Auto-save progress for both affected images
+  await saveMultipleImageProgress([currentImage.id, targetImage.id]);
 };
 
 const removeLink = async (targetImageId) => {
   if (!currentNodeWithLinks.value) return;
 
   // When filtered, we need to find images in the original list
-  const searchList = isFiltered.value ? originalImageList.value : imageList.value;
-  
+  const searchList = isFiltered.value
+    ? originalImageList.value
+    : imageList.value;
+
   const currentImage = searchList.find(
     (img) => img.id === currentNodeWithLinks.value.id
   );
@@ -1569,7 +1660,9 @@ const removeLink = async (targetImageId) => {
 
   // If we're filtered, also update the corresponding image in the filtered list
   if (isFiltered.value) {
-    const currentFilteredImage = imageList.value.find(img => img.id === currentNodeWithLinks.value.id);
+    const currentFilteredImage = imageList.value.find(
+      (img) => img.id === currentNodeWithLinks.value.id
+    );
     if (currentFilteredImage && currentFilteredImage !== currentImage) {
       currentFilteredImage.links = [...currentImage.links]; // Create new array to trigger reactivity
     }
@@ -1582,8 +1675,8 @@ const removeLink = async (targetImageId) => {
   // Update the viewer nodes to reflect changes
   updateViewerNodes();
 
-  // Auto-save progress
-  await saveProgressToStorage();
+  // Auto-save progress for both affected images
+  await saveMultipleImageProgress([currentImage.id, targetImage.id]);
 };
 
 // ------------- Navigation -------------
@@ -1730,12 +1823,12 @@ const formatGpsCoordinates = (coords) => {
 const getImageNameById = (imageId) => {
   // Search in current visible list first
   let image = imageList.value.find((img) => img.id === imageId);
-  
+
   // If not found and we're filtered, search in original list
   if (!image && isFiltered.value) {
     image = originalImageList.value.find((img) => img.id === imageId);
   }
-  
+
   return image ? image.filename : "Unknown";
 };
 
@@ -1784,9 +1877,11 @@ const clearAllLinks = async () => {
   // Show confirmation dialog
   if (confirm(confirmMessage)) {
     // User confirmed, proceed with clearing
+    const affectedImageIds = [];
     imageList.value.forEach((image) => {
       image.links = [];
       image.northCalibration = null;
+      affectedImageIds.push(image.id);
     });
 
     updateCompassState();
@@ -1794,7 +1889,7 @@ const clearAllLinks = async () => {
     showStatus(
       `Cleared all links and compass calibrations from ${projectInfo}`
     );
-    await saveProgressToStorage();
+    await saveMultipleImageProgress(affectedImageIds, "manual");
   } else {
     showStatus("Clear operation cancelled");
   }
@@ -1802,8 +1897,10 @@ const clearAllLinks = async () => {
 
 const exportLinks = () => {
   // Always export the complete dataset, regardless of current filter state
-  const imagesToExport = isFiltered.value ? originalImageList.value : imageList.value;
-  
+  const imagesToExport = isFiltered.value
+    ? originalImageList.value
+    : imageList.value;
+
   const config = {
     baseUrl: BASE_URL.value,
     directoryName: selectedDirectory.value,
@@ -1857,7 +1954,9 @@ const exportLinks = () => {
           section: selectedSection.value,
           subSection: selectedSubSection.value,
           directoryPath: selectedDirectory.value,
-          wasVisible: isFiltered.value ? imageList.value.some(visImg => visImg.id === img.id) : true,
+          wasVisible: isFiltered.value
+            ? imageList.value.some((visImg) => visImg.id === img.id)
+            : true,
         },
       };
     }),
@@ -1876,10 +1975,10 @@ const exportLinks = () => {
 
   const totalImages = imagesToExport.length;
   const currentlyVisible = imageList.value.length;
-  const exportMessage = isFiltered.value 
+  const exportMessage = isFiltered.value
     ? `Configuration exported with all ${totalImages} images (currently showing ${currentlyVisible}, filter: every 6th image)`
     : `Configuration exported with all ${totalImages} images (no filter applied)`;
-  
+
   showStatus(exportMessage);
 };
 
@@ -2243,6 +2342,7 @@ const importConfiguration = async (config) => {
     let calibrationCount = 0;
     const totalImages = config.images.length;
     let processedImages = 0;
+    const modifiedImageIds = new Set(); // Track which images were modified
 
     // Process images with progress updates
     for (const configImage of config.images) {
@@ -2255,6 +2355,8 @@ const importConfiguration = async (config) => {
       );
 
       if (currentImage) {
+        let imageModified = false;
+
         // Import links
         if (configImage.links && Array.isArray(configImage.links)) {
           currentImage.links = [];
@@ -2274,6 +2376,7 @@ const importConfiguration = async (config) => {
                 if (targetImage) {
                   currentImage.links.push({ nodeId: targetImage.id });
                   importedCount++;
+                  imageModified = true;
                 }
               }
             }
@@ -2287,6 +2390,7 @@ const importConfiguration = async (config) => {
             isSet: configImage._metadata.northCalibration.isSet,
           };
           calibrationCount++;
+          imageModified = true;
         } else if (
           configImage.sphereCorrection?.pan &&
           configImage.sphereCorrection.pan !== 0
@@ -2296,6 +2400,12 @@ const importConfiguration = async (config) => {
             isSet: true,
           };
           calibrationCount++;
+          imageModified = true;
+        }
+
+        // Track modified images for saving
+        if (imageModified) {
+          modifiedImageIds.add(currentImage.id);
         }
       }
 
@@ -2319,8 +2429,10 @@ const importConfiguration = async (config) => {
     updateViewerNodes();
     updateCompassState();
 
-    // Auto-save the imported configuration
-    await saveProgressToStorage();
+    // Auto-save all modified images
+    if (modifiedImageIds.size > 0) {
+      await saveMultipleImageProgress(Array.from(modifiedImageIds), "manual");
+    }
 
     importProgress.value.percent = 100;
 
@@ -2394,7 +2506,7 @@ const updateViewerNodes = () => {
   console.log(`Creating virtual tour with ${totalImages} nodes`);
 
   // Get IDs of currently visible images for link filtering
-  const visibleImageIds = imageList.value.map(img => img.id);
+  const visibleImageIds = imageList.value.map((img) => img.id);
 
   const nodes = imageList.value.map((image, index) => {
     const viewerLinks = [];
@@ -2412,8 +2524,10 @@ const updateViewerNodes = () => {
     }
 
     // Add sequential navigation links for better UX (only if no user links to visible images exist)
-    const hasVisibleUserLinks = image.links && image.links.some(link => visibleImageIds.includes(link.nodeId));
-    
+    const hasVisibleUserLinks =
+      image.links &&
+      image.links.some((link) => visibleImageIds.includes(link.nodeId));
+
     if (totalImages > 1 && !hasVisibleUserLinks) {
       // Add previous image link (at 180° - left side)
       if (index > 0) {
@@ -2442,10 +2556,6 @@ const updateViewerNodes = () => {
           ? [image.gpsCoordinates.altitude]
           : []),
       ];
-      console.log(
-        `GPS data for node ${image.id} (${image.filename}):`,
-        gpsData
-      );
     } else {
       console.log(`No GPS data for node ${image.id} (${image.filename})`);
     }
