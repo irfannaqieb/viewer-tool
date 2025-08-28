@@ -135,19 +135,49 @@ export default defineEventHandler(async (event) => {
             : join(fullDirectoryPath, entry.name);
 
           const buffer = await fs.readFile(filePathForGPS);
+
+          // Extract GPS coordinates using exifr.gps()
           const gpsData = await exifr.gps(buffer);
+
+          // Also extract specific GPS tags including altitude
+          const gpsExif = await exifr.parse(buffer, {
+            gps: true,
+            pick: [
+              "GPSLatitude",
+              "GPSLongitude",
+              "GPSAltitude",
+              "GPSAltitudeRef",
+            ],
+          });
+
           if (
             gpsData &&
-            (gpsData as any).latitude !== undefined &&
-            (gpsData as any).longitude !== undefined
+            gpsData.latitude !== undefined &&
+            gpsData.longitude !== undefined
           ) {
             gps = {
-              latitude: (gpsData as any).latitude as number,
-              longitude: (gpsData as any).longitude as number,
-              ...((gpsData as any).altitude !== undefined
-                ? { altitude: (gpsData as any).altitude as number }
-                : {}),
+              latitude: gpsData.latitude,
+              longitude: gpsData.longitude,
             };
+
+            // Try to get altitude from the specific GPS EXIF data
+            if (gpsExif && gpsExif.GPSAltitude !== undefined) {
+              let altitude = gpsExif.GPSAltitude;
+
+              // Handle altitude reference (0 = above sea level, 1 = below sea level)
+              if (gpsExif.GPSAltitudeRef === 1) {
+                altitude = -altitude;
+              }
+
+              gps.altitude = altitude;
+              console.log(`  Final altitude: ${altitude}`);
+            } else {
+              console.log("  No altitude data found in EXIF");
+            }
+
+            // console.log(`  Final GPS object:`, gps);
+          } else {
+            console.log("  No valid GPS coordinates found");
           }
         } catch (ex) {
           // Non-fatal: just skip GPS if it fails
