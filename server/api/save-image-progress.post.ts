@@ -66,6 +66,7 @@ export default defineEventHandler(async (event) => {
 			links: imageData.links || [],
 			northCalibration: imageData.northCalibration || null,
 			gpsCoordinates: imageData.gpsCoordinates || null,
+			_metadata: imageData._metadata || {},
 			lastModified: new Date().toISOString(),
 			version: "1.0",
 		};

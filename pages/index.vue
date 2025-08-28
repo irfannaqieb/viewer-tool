@@ -257,6 +257,102 @@
               ↩️ Restore All Images
             </button>
 
+            <!-- Hide/Unhide Controls for Filtered Mode -->
+            <div
+              v-if="isFiltered"
+              class="mt-3 p-2 bg-gray-700 rounded border border-gray-600"
+            >
+              <div class="text-xs text-gray-300 mb-2">
+                🔧 Fine-tune Visibility:
+              </div>
+
+              <!-- Dropdown to select image to toggle -->
+              <div class="relative mb-2">
+                <select
+                  v-model="selectedImageToToggle"
+                  class="w-full px-2 py-1 bg-gray-600 text-white text-xs rounded focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none"
+                >
+                  <option value="" disabled>Select image to toggle...</option>
+                  <optgroup label="📱 Currently Visible">
+                    <option
+                      v-for="img in imageList"
+                      :key="`visible-${img.filename}`"
+                      :value="getOriginalImageIndex(img)"
+                    >
+                      {{
+                        getImageDisplayName(img, getOriginalImageIndex(img))
+                      }}
+                      ✅
+                    </option>
+                  </optgroup>
+                  <optgroup label="👁️‍🗨️ Currently Hidden">
+                    <option
+                      v-for="hiddenIndex in hiddenImageIndices"
+                      :key="`hidden-${hiddenIndex}`"
+                      :value="hiddenIndex"
+                    >
+                      {{
+                        getImageDisplayName(
+                          originalImageList[hiddenIndex],
+                          hiddenIndex
+                        )
+                      }}
+                      ❌
+                    </option>
+                  </optgroup>
+                </select>
+                <div
+                  class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
+                >
+                  <svg
+                    class="w-3 h-3 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Toggle Button -->
+              <button
+                @click="toggleImageVisibility"
+                :disabled="selectedImageToToggle === ''"
+                class="w-full px-2 py-1 text-xs rounded transition-colors"
+                :class="
+                  selectedImageToToggle !== '' &&
+                  !hiddenImageIndices.includes(parseInt(selectedImageToToggle))
+                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                    : selectedImageToToggle !== '' &&
+                      hiddenImageIndices.includes(
+                        parseInt(selectedImageToToggle)
+                      )
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-gray-600 cursor-not-allowed text-gray-400'
+                "
+              >
+                <span v-if="selectedImageToToggle === ''"
+                  >Select an image first</span
+                >
+                <span
+                  v-else-if="
+                    !hiddenImageIndices.includes(
+                      parseInt(selectedImageToToggle)
+                    )
+                  "
+                >
+                  👁️‍🗨️ Hide Selected Image
+                </span>
+                <span v-else> 👁️ Show Selected Image </span>
+              </button>
+            </div>
+
             <div v-if="isFiltered" class="text-xs text-gray-400">
               <span class="text-orange-400">
                 {{ imageList.length }} of {{ originalImageList.length }} visible
@@ -927,6 +1023,7 @@ const compressionStats = ref({
 const isFiltered = ref(false);
 const originalImageList = ref([]);
 const hiddenImageIndices = ref([]);
+const selectedImageToToggle = ref("");
 
 // Computed property to get current node with up-to-date links
 const currentNodeWithLinks = computed(() => {
@@ -1071,6 +1168,7 @@ const saveCurrentImageProgress = async (triggerType = "auto") => {
       links: currentNode.value.links || [],
       northCalibration: currentNode.value.northCalibration,
       gpsCoordinates: currentNode.value.gpsCoordinates,
+      _metadata: currentNode.value._metadata || {}, // Include metadata for custom visibility settings
     };
 
     // Save current image to individual file
@@ -1117,8 +1215,10 @@ const saveMultipleImageProgress = async (imageIds, triggerType = "auto") => {
     }
 
     // Find all images to save
-    const searchList = isFiltered.value ? originalImageList.value : imageList.value;
-    const imagesToSave = searchList.filter(img => imageIds.includes(img.id));
+    const searchList = isFiltered.value
+      ? originalImageList.value
+      : imageList.value;
+    const imagesToSave = searchList.filter((img) => imageIds.includes(img.id));
 
     // Save each image
     const savePromises = imagesToSave.map(async (image) => {
@@ -1131,6 +1231,7 @@ const saveMultipleImageProgress = async (imageIds, triggerType = "auto") => {
         links: image.links || [],
         northCalibration: image.northCalibration,
         gpsCoordinates: image.gpsCoordinates,
+        _metadata: image._metadata || {}, // Include metadata for custom visibility settings
       };
 
       try {
@@ -1146,7 +1247,7 @@ const saveMultipleImageProgress = async (imageIds, triggerType = "auto") => {
     });
 
     const results = await Promise.all(savePromises);
-    const successCount = results.filter(success => success).length;
+    const successCount = results.filter((success) => success).length;
 
     if (successCount > 0) {
       lastSaved.value = new Date().toLocaleTimeString();
@@ -1154,7 +1255,6 @@ const saveMultipleImageProgress = async (imageIds, triggerType = "auto") => {
         showStatus(`Saved ${successCount} image(s)`);
       }
     }
-
   } catch (error) {
     console.error("Error saving multiple images:", error);
     if (triggerType === "manual") {
@@ -1224,9 +1324,25 @@ const loadProjectProgress = async () => {
         if (!currentImg.gpsCoordinates && savedImg.gpsCoordinates) {
           currentImg.gpsCoordinates = savedImg.gpsCoordinates;
         }
+
+        // Restore metadata including custom visibility settings
+        if (savedImg._metadata) {
+          if (!currentImg._metadata) {
+            currentImg._metadata = {};
+          }
+          // Merge saved metadata with current metadata
+          currentImg._metadata = {
+            ...currentImg._metadata,
+            ...savedImg._metadata,
+          };
+        }
+
         restoredCount++;
       }
     });
+
+    // Ensure bidirectional link consistency after restore
+    ensureBidirectionalLinks();
 
     // Update viewer with restored links
     updateViewerNodes();
@@ -1250,6 +1366,47 @@ const loadProjectProgress = async () => {
     showStatus("Failed to load saved progress");
     return false;
   }
+};
+
+// Ensure bidirectional links consistency
+const ensureBidirectionalLinks = () => {
+  console.log("Ensuring bidirectional link consistency...");
+
+  // Create a map of all links that should exist
+  const linkMap = new Map();
+
+  // First pass: collect all links
+  imageList.value.forEach((image) => {
+    if (image.links && image.links.length > 0) {
+      image.links.forEach((link) => {
+        const sourceId = image.id;
+        const targetId = link.nodeId;
+
+        // Create a bidirectional mapping
+        if (!linkMap.has(sourceId)) {
+          linkMap.set(sourceId, new Set());
+        }
+        if (!linkMap.has(targetId)) {
+          linkMap.set(targetId, new Set());
+        }
+
+        linkMap.get(sourceId).add(targetId);
+        linkMap.get(targetId).add(sourceId);
+      });
+    }
+  });
+
+  // Second pass: apply consistent bidirectional links
+  imageList.value.forEach((image) => {
+    const expectedLinks = linkMap.get(image.id);
+    if (expectedLinks && expectedLinks.size > 0) {
+      // Convert Set to array of link objects
+      image.links = Array.from(expectedLinks).map((nodeId) => ({ nodeId }));
+      console.log(`Updated links for image ${image.id}:`, image.links);
+    }
+  });
+
+  console.log("Bidirectional link consistency ensured");
 };
 
 // Legacy function for compatibility - now loads project progress
@@ -2111,12 +2268,42 @@ const filterEveryFifthImage = () => {
   hiddenImageIndices.value = [];
 
   for (let i = 0; i < imageList.value.length; i++) {
-    if (i % 6 === 0) {
-      // Keep this image (every 6th starting from 0)
-      keptImages.push(imageList.value[i]);
+    // Check if this image has been manually toggled before
+    const hasCustomVisibility =
+      imageList.value[i]._metadata?.hasCustomVisibility === true;
+    const shouldBeVisibleByDefault = i % 6 === 0; // Every 6th image
+
+    if (hasCustomVisibility) {
+      // Preserve custom visibility setting
+      const isCustomVisible = imageList.value[i]._metadata.wasVisible;
+      if (isCustomVisible) {
+        keptImages.push(imageList.value[i]);
+      } else {
+        hiddenImageIndices.value.push(i);
+      }
     } else {
-      // Hide this image
-      hiddenImageIndices.value.push(i);
+      // Apply default filtering pattern
+      if (shouldBeVisibleByDefault) {
+        // Keep this image (every 6th starting from 0)
+        keptImages.push(imageList.value[i]);
+
+        // Set wasVisible to true for kept images
+        if (imageList.value[i]._metadata) {
+          imageList.value[i]._metadata.wasVisible = true;
+        } else {
+          imageList.value[i]._metadata = { wasVisible: true };
+        }
+      } else {
+        // Hide this image
+        hiddenImageIndices.value.push(i);
+
+        // Set wasVisible to false for hidden images
+        if (imageList.value[i]._metadata) {
+          imageList.value[i]._metadata.wasVisible = false;
+        } else {
+          imageList.value[i]._metadata = { wasVisible: false };
+        }
+      }
     }
   }
 
@@ -2182,6 +2369,13 @@ const restoreAllImages = () => {
   // Restore original image list
   imageList.value = [...originalImageList.value];
 
+  // Reset all wasVisible metadata to true
+  imageList.value.forEach((image) => {
+    if (image._metadata) {
+      image._metadata.wasVisible = true;
+    }
+  });
+
   // Update current image reference
   if (currentNode.value) {
     const restoredIndex = imageList.value.findIndex(
@@ -2206,6 +2400,132 @@ const restoreAllImages = () => {
   showStatus(
     `All images restored (${imageList.value.length} total images available)`
   );
+};
+
+// ------------- Hide/Unhide individual images functions -------------
+const getOriginalImageIndex = (image) => {
+  return originalImageList.value.findIndex(
+    (img) => img.filename === image.filename
+  );
+};
+
+const getImageDisplayName = (image, index) => {
+  return `${index + 1}. ${image.filename}`;
+};
+
+const toggleImageVisibility = async () => {
+  const selectedIndex = parseInt(selectedImageToToggle.value);
+  if (
+    isNaN(selectedIndex) ||
+    selectedIndex < 0 ||
+    selectedIndex >= originalImageList.value.length
+  ) {
+    showStatus("Please select a valid image");
+    return;
+  }
+
+  const targetImage = originalImageList.value[selectedIndex];
+  const isCurrentlyHidden = hiddenImageIndices.value.includes(selectedIndex);
+
+  if (isCurrentlyHidden) {
+    // Show the image - remove from hidden indices and add to visible list
+    hiddenImageIndices.value = hiddenImageIndices.value.filter(
+      (idx) => idx !== selectedIndex
+    );
+
+    // Find the correct position to insert the image in the filtered list
+    // We need to maintain the original order
+    const visibleIndices = [];
+    for (let i = 0; i < originalImageList.value.length; i++) {
+      if (!hiddenImageIndices.value.includes(i)) {
+        visibleIndices.push(i);
+      }
+    }
+
+    // Rebuild the image list based on visible indices
+    imageList.value = visibleIndices.map((idx) => originalImageList.value[idx]);
+
+    // Update wasVisible metadata and mark as custom
+    if (targetImage._metadata) {
+      targetImage._metadata.wasVisible = true;
+      targetImage._metadata.hasCustomVisibility = true;
+    } else {
+      targetImage._metadata = {
+        wasVisible: true,
+        hasCustomVisibility: true,
+      };
+    }
+
+    showStatus(`Image "${targetImage.filename}" is now visible`);
+  } else {
+    // Hide the image - add to hidden indices and remove from visible list
+    hiddenImageIndices.value.push(selectedIndex);
+    hiddenImageIndices.value.sort((a, b) => a - b); // Keep sorted
+
+    // Remove from visible list
+    imageList.value = imageList.value.filter(
+      (img) => img.filename !== targetImage.filename
+    );
+
+    // Update wasVisible metadata and mark as custom
+    if (targetImage._metadata) {
+      targetImage._metadata.wasVisible = false;
+      targetImage._metadata.hasCustomVisibility = true;
+    } else {
+      targetImage._metadata = {
+        wasVisible: false,
+        hasCustomVisibility: true,
+      };
+    }
+
+    // If we hid the current image, navigate to the nearest visible one
+    if (
+      currentNode.value &&
+      currentNode.value.filename === targetImage.filename
+    ) {
+      if (imageList.value.length > 0) {
+        // Find nearest visible image
+        const nearestIndex = Math.min(
+          currentImageIndex.value,
+          imageList.value.length - 1
+        );
+        currentImageIndex.value = nearestIndex;
+        currentNode.value = imageList.value[nearestIndex];
+        currentImageName.value = currentNode.value.filename;
+      }
+    } else {
+      // Update current image index if needed
+      const newIndex = imageList.value.findIndex(
+        (img) => img.filename === currentNode.value?.filename
+      );
+      if (newIndex !== -1) {
+        currentImageIndex.value = newIndex;
+      }
+    }
+
+    showStatus(`Image "${targetImage.filename}" is now hidden`);
+  }
+
+  // Update viewer with new image list
+  if (virtualTour.value) {
+    updateViewerNodes();
+  }
+
+  // Reset the selection dropdown
+  selectedImageToToggle.value = "";
+
+  // Auto-save progress if enabled (save the toggled image)
+  if (saveProgress.value) {
+    // We need to temporarily make the toggled image the current one to save it
+    const originalCurrentNode = currentNode.value;
+    currentNode.value = targetImage;
+    try {
+      await saveCurrentImageProgress("auto");
+    } finally {
+      // Restore the original current node
+      currentNode.value = originalCurrentNode;
+    }
+  }
 };
 
 // ------------- Import configuration functions -------------

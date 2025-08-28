@@ -1029,31 +1029,20 @@ const navigateToImage = (imageId) => {
 };
 
 const nextImage = () => {
-  // Navigate to first linked image if available, otherwise sequential
-  if (currentNode.value?.links?.length > 0) {
-    navigateToImage(currentNode.value.links[0].nodeId);
+  // Always navigate sequentially through the image list
+  if (currentImageIndex.value < imageList.value.length - 1) {
+    navigateToImage(imageList.value[currentImageIndex.value + 1].id);
   } else {
-    // Fallback to sequential navigation
-    if (currentImageIndex.value < imageList.value.length - 1) {
-      navigateToImage(imageList.value[currentImageIndex.value + 1].id);
-    } else {
-      navigateToImage(imageList.value[0].id); // Loop to first
-    }
+    navigateToImage(imageList.value[0].id); // Loop to first
   }
 };
 
 const previousImage = () => {
-  // Navigate to last linked image if available, otherwise sequential
-  if (currentNode.value?.links?.length > 0) {
-    const lastLinkIndex = currentNode.value.links.length - 1;
-    navigateToImage(currentNode.value.links[lastLinkIndex].nodeId);
+  // Always navigate sequentially through the image list
+  if (currentImageIndex.value > 0) {
+    navigateToImage(imageList.value[currentImageIndex.value - 1].id);
   } else {
-    // Fallback to sequential navigation
-    if (currentImageIndex.value > 0) {
-      navigateToImage(imageList.value[currentImageIndex.value - 1].id);
-    } else {
-      navigateToImage(imageList.value[imageList.value.length - 1].id); // Loop to last
-    }
+    navigateToImage(imageList.value[imageList.value.length - 1].id); // Loop to last
   }
 };
 
