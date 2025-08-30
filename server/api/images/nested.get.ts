@@ -168,9 +168,7 @@ export default defineEventHandler(async (event) => {
               if (gpsExif.GPSAltitudeRef === 1) {
                 altitude = -altitude;
               }
-
               gps.altitude = altitude;
-              console.log(`  Final altitude: ${altitude}`);
             } else {
               console.log("  No altitude data found in EXIF");
             }

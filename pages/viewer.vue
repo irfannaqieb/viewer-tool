@@ -661,56 +661,51 @@ const loadConfiguration = async (config) => {
     importProgress.value.message = "Building image data...";
     importProgress.value.percent = 70;
 
-    // Convert config images to our format, filtering for visible images only
-    imageList.value = config.images
-      .filter((configImage) => configImage._metadata?.wasVisible === true)
-      .map((configImage, index) => {
-        // Parse GPS coordinates from config format [longitude, latitude, altitude?]
-        const gpsCoordinates = Array.isArray(configImage.gps)
-          ? {
-              longitude: configImage.gps[0],
-              latitude: configImage.gps[1],
-              altitude: configImage.gps[2],
-            }
-          : null;
+    // Convert config images to our format - LOAD ALL IMAGES, no wasVisible filter
+    imageList.value = config.images.map((configImage, index) => {
+      // Parse GPS coordinates from config format [longitude, latitude, altitude?]
+      const gpsCoordinates = Array.isArray(configImage.gps)
+        ? {
+            longitude: configImage.gps[0],
+            latitude: configImage.gps[1],
+            altitude: configImage.gps[2],
+          }
+        : null;
 
-        // Get sphereCorrection pan value (keep as numeric degrees, do NOT convert to radians)
-        const sphereCorrectionPan =
-          configImage.sphereCorrection?.pan ??
-          configImage._metadata?.northCalibration?.heading;
+      // Get sphereCorrection pan value (keep as numeric degrees, do NOT convert to radians)
+      const sphereCorrectionPan =
+        configImage.sphereCorrection?.pan ??
+        configImage._metadata?.northCalibration?.heading;
 
-        // Parse north calibration from sphereCorrection or metadata
-        let northCalibration = null;
-        if (configImage._metadata?.northCalibration?.isSet) {
-          northCalibration = configImage._metadata.northCalibration;
-        } else if (
-          configImage.sphereCorrection?.pan &&
-          configImage.sphereCorrection.pan !== 0
-        ) {
-          northCalibration = {
-            heading: configImage.sphereCorrection.pan,
-            isSet: true,
-          };
-        }
-
-        // Extract filename from panorama URL or metadata
-        const filename =
-          configImage._metadata?.filename ||
-          configImage.panorama.split("/").pop();
-
-        return {
-          id: configImage.id,
-          filename: filename,
-          panorama: configImage.panorama,
-          links: configImage.links || [],
-          gpsCoordinates, // <-- keep GPS here
-          northCalibration: northCalibration, // (for UI)
-          sphereCorrectionPan, // <-- numeric degrees (do NOT convert to radians)
+      // Parse north calibration from sphereCorrection or metadata
+      let northCalibration = null;
+      if (configImage._metadata?.northCalibration?.isSet) {
+        northCalibration = configImage._metadata.northCalibration;
+      } else if (
+        configImage.sphereCorrection?.pan &&
+        configImage.sphereCorrection.pan !== 0
+      ) {
+        northCalibration = {
+          heading: configImage.sphereCorrection.pan,
+          isSet: true,
         };
-      });
+      }
 
-    // Prune invalid links that point to filtered-out nodes
-    pruneInvalidLinks();
+      // Extract filename from panorama URL or metadata
+      const filename =
+        configImage._metadata?.filename ||
+        configImage.panorama.split("/").pop();
+
+      return {
+        id: configImage.id,
+        filename: filename,
+        panorama: configImage.panorama,
+        links: configImage.links || [],
+        gpsCoordinates, // <-- keep GPS here
+        northCalibration: northCalibration, // (for UI)
+        sphereCorrectionPan, // <-- numeric degrees (do NOT convert to radians)
+      };
+    });
 
     console.log("Loaded configuration summary:", {
       totalImages: imageList.value.length,
@@ -1075,77 +1070,6 @@ const formatGpsCoordinates = (coords) => {
   return formatted;
 };
 
-// Prune invalid links that point to filtered-out nodes and create GPS-based links
-const pruneInvalidLinks = () => {
-  const keep = new Set(imageList.value.map((n) => n.id));
-
-  // First, remove invalid links
-  imageList.value = imageList.value.map((n) => {
-    const seen = new Set();
-    const pruned = (n.links || []).filter((l) => {
-      const ok = keep.has(l.nodeId) && !seen.has(l.nodeId);
-      if (ok) seen.add(l.nodeId);
-      return ok;
-    });
-    return { ...n, links: pruned };
-  });
-
-  // If most nodes end up isolated, create GPS-based links
-  const isolatedNodes = imageList.value.filter((n) => n.links.length === 0);
-  if (isolatedNodes.length > imageList.value.length * 0.7) {
-    // More than 70% isolated
-    console.log("Many nodes are isolated, creating GPS-based links...");
-    createGpsBasedLinks();
-  }
-};
-
-// Create links between nearby nodes based on GPS coordinates
-const createGpsBasedLinks = () => {
-  const maxDistance = 50; // meters
-
-  imageList.value.forEach((node, index) => {
-    if (!node.gpsCoordinates) return;
-
-    const nearbyNodes = [];
-
-    imageList.value.forEach((otherNode, otherIndex) => {
-      if (index === otherIndex || !otherNode.gpsCoordinates) return;
-
-      const distance = calculateGpsDistance(
-        node.gpsCoordinates.latitude,
-        node.gpsCoordinates.longitude,
-        otherNode.gpsCoordinates.latitude,
-        otherNode.gpsCoordinates.longitude
-      );
-
-      if (distance <= maxDistance) {
-        nearbyNodes.push({ nodeId: otherNode.id, distance });
-      }
-    });
-
-    // Sort by distance and take the closest 3 nodes
-    nearbyNodes.sort((a, b) => a.distance - b.distance);
-    node.links = nearbyNodes.slice(0, 3).map((n) => ({ nodeId: n.nodeId }));
-  });
-
-  console.log("Created GPS-based links for", imageList.value.length, "nodes");
-};
-
-// Calculate distance between two GPS coordinates in meters
-const calculateGpsDistance = (lat1, lon1, lat2, lon2) => {
-  const R = 6371000; // Earth's radius in meters
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
-
 // ------------- Compass/North calibration functions -------------
 const updateCompassState = () => {
   if (!currentNode.value) return;
@@ -1191,22 +1115,34 @@ const updateViewerNodes = () => {
             }
           : undefined;
 
+      // Only include links if they actually exist and are valid
+      const validLinks = (image.links || [])
+        .filter((link) => {
+          // Make sure the target node exists in our image list
+          return imageList.value.some((img) => img.id === link.nodeId);
+        })
+        .map((link) => ({ nodeId: link.nodeId }));
+
       const node = {
         id: image.id,
         panorama: image.panorama,
         name: image.filename,
         gps: nodeGps, // <-- required for GPS bearings
         sphereCorrection: nodeSphereCorrection, // <-- align pano north to real north
-        links: (image.links || []).map((l) => ({ nodeId: l.nodeId })), // <-- no yaw/pitch here
       };
+
+      // Only add links property if there are actual valid links
+      if (validLinks.length > 0) {
+        node.links = validLinks;
+      }
 
       console.log("Created node:", {
         id: node.id,
-        panorama: node.panorama,
+        name: node.name,
         hasGps: !!node.gps,
-        gps: node.gps,
-        sphereCorrection: node.sphereCorrection,
-        linkCount: node.links.length,
+        linkCount: validLinks.length,
+        links: validLinks.map((l) => l.nodeId),
+        hasLinksProperty: "links" in node,
       });
 
       return node;
@@ -1218,6 +1154,13 @@ const updateViewerNodes = () => {
       currentNode.value?.id || imageList.value[0]?.id
     );
     console.log("Nodes set successfully");
+
+    // Log summary of links
+    const nodesWithLinks = nodes.filter((n) => n.links.length > 0);
+    const nodesWithoutLinks = nodes.filter((n) => n.links.length === 0);
+    console.log(
+      `Nodes with links: ${nodesWithLinks.length}, without links: ${nodesWithoutLinks.length}`
+    );
   } catch (error) {
     console.error("Error updating viewer nodes:", error);
     showStatus("Failed to update viewer nodes: " + error.message);

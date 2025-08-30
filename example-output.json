@@ -1,218 +1,1487 @@
 {
-  "baseUrl": "/images/pertamina/",
-  "directoryName": "pertamina",
+  "baseUrl": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/",
+  "directoryName": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+  "exportInfo": {
+    "exportedAt": "2025-08-29T03:42:54.057Z",
+    "wasFiltered": false,
+    "totalImages": 71,
+    "visibleImages": 71,
+    "hiddenImages": 0,
+    "filterType": null
+  },
   "images": [
     {
       "id": "1",
-      "panorama": "/images/pertamina/IMG_20250623_091847_00_025.jpg",
-      "gps": [
-        106.2569290399523,
-        -5.450691879998811
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105348_00_030_compressed.jpg",
+      "gps": [106.25675325005078, -5.45049408, 35.7158940397351],
+      "sphereCorrection": {
+        "pan": 28.30783231794557,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [
+        {
+          "nodeId": "19"
+        }
       ],
-      "panoData": {
-        "poseHeading": 177.26776648310732
-      },
-      "links": {
-        "next": {
-          "nodeId": "2"
-        },
-        "prev": {
-          "nodeId": "8"
-        }
-      },
       "_metadata": {
-        "filename": "IMG_20250623_091847_00_025.jpg",
-        "originalLinks": [],
+        "filename": "IMG_20250624_105348_00_030.jpg",
         "northCalibration": {
-          "heading": 177.26776648310732,
+          "heading": 28.30783231794557,
           "isSet": true
-        }
+        },
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
       }
     },
     {
       "id": "2",
-      "panorama": "/images/pertamina/IMG_20250623_091903_00_026.jpg",
-      "gps": [
-        106.25693348000057,
-        -5.450691730003619
-      ],
-      "panoData": {
-        "poseHeading": 160.45508838809025
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105403_00_031_compressed.jpg",
+      "gps": [106.25675893997446, -5.450493009996876, 35.71674491392801],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
       },
-      "links": {
-        "next": {
-          "nodeId": "3"
-        },
-        "prev": {
-          "nodeId": "1"
-        }
-      },
+      "links": [],
       "_metadata": {
-        "filename": "IMG_20250623_091903_00_026.jpg",
-        "originalLinks": [],
-        "northCalibration": {
-          "heading": 160.45508838809025,
-          "isSet": true
-        }
+        "filename": "IMG_20250624_105403_00_031.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
       }
     },
     {
       "id": "3",
-      "panorama": "/images/pertamina/IMG_20250623_091925_00_027.jpg",
-      "gps": [
-        106.2569391500012,
-        -5.450691970003959
-      ],
-      "panoData": {
-        "poseHeading": 97.12218121936225
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105422_00_032_compressed.jpg",
+      "gps": [106.25676641994215, -5.450493640001634, 35.72111599907386],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
       },
-      "links": {
-        "next": {
-          "nodeId": "4"
-        },
-        "prev": {
-          "nodeId": "2"
-        }
-      },
+      "links": [],
       "_metadata": {
-        "filename": "IMG_20250623_091925_00_027.jpg",
-        "originalLinks": [],
-        "northCalibration": {
-          "heading": 97.12218121936225,
-          "isSet": true
-        }
+        "filename": "IMG_20250624_105422_00_032.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
       }
     },
     {
       "id": "4",
-      "panorama": "/images/pertamina/IMG_20250623_091953_00_028.jpg",
-      "gps": [
-        106.25694239995639,
-        -5.450692559996741
-      ],
-      "panoData": {
-        "poseHeading": 185.31209229367656
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105445_00_033_compressed.jpg",
+      "gps": [106.25677434001427, -5.4504932, 35.724501758499414],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
       },
-      "links": {
-        "next": {
-          "nodeId": "5"
-        },
-        "prev": {
-          "nodeId": "3"
-        }
-      },
+      "links": [],
       "_metadata": {
-        "filename": "IMG_20250623_091953_00_028.jpg",
-        "originalLinks": [],
-        "northCalibration": {
-          "heading": 185.31209229367656,
-          "isSet": true
-        }
+        "filename": "IMG_20250624_105445_00_033.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
       }
     },
     {
       "id": "5",
-      "panorama": "/images/pertamina/IMG_20250623_092037_00_029.jpg",
-      "gps": [
-        106.25695227999017,
-        -5.4506935399990954
-      ],
-      "panoData": {
-        "poseHeading": 120.95984847673486
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105507_00_034_compressed.jpg",
+      "gps": [106.25678083999894, -5.450495329995694, 35.72068298969072],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
       },
-      "links": {
-        "next": {
-          "nodeId": "6"
-        },
-        "prev": {
-          "nodeId": "4"
-        }
-      },
+      "links": [],
       "_metadata": {
-        "filename": "IMG_20250623_092037_00_029.jpg",
-        "originalLinks": [],
-        "northCalibration": {
-          "heading": 120.95984847673486,
-          "isSet": true
-        }
+        "filename": "IMG_20250624_105507_00_034.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
       }
     },
     {
       "id": "6",
-      "panorama": "/images/pertamina/IMG_20250624_124442_00_269.jpg",
-      "gps": [
-        106.25681888000592,
-        -5.450444490000455
-      ],
-      "panoData": {
-        "poseHeading": 291.00291370820713
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105525_00_035_compressed.jpg",
+      "gps": [106.25678918994609, -5.450496350000713, 35.705003734129946],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
       },
-      "links": {
-        "next": {
-          "nodeId": "7"
-        },
-        "prev": {
-          "nodeId": "5"
-        }
-      },
+      "links": [],
       "_metadata": {
-        "filename": "IMG_20250624_124442_00_269.jpg",
-        "originalLinks": [],
-        "northCalibration": {
-          "heading": 291.00291370820713,
-          "isSet": true
-        }
+        "filename": "IMG_20250624_105525_00_035.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
       }
     },
     {
       "id": "7",
-      "panorama": "/images/pertamina/IMG_20250624_124634_00_270.jpg",
-      "gps": [
-        106.25695064994447,
-        -5.450469089999865
-      ],
-      "panoData": {
-        "poseHeading": 221.76390962240032
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105541_00_036_compressed.jpg",
+      "gps": [106.25679742000857, -5.450496280000611, 35.693978895096215],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
       },
-      "links": {
-        "next": {
-          "nodeId": "8"
+      "links": [
+        {
+          "nodeId": "19"
         },
-        "prev": {
-          "nodeId": "6"
+        {
+          "nodeId": "13"
         }
-      },
+      ],
       "_metadata": {
-        "filename": "IMG_20250624_124634_00_270.jpg",
-        "originalLinks": [],
+        "filename": "IMG_20250624_105541_00_036.jpg",
         "northCalibration": {
-          "heading": 221.76390962240032,
+          "heading": 0,
           "isSet": true
-        }
+        },
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
       }
     },
     {
       "id": "8",
-      "panorama": "/images/pertamina/IMG_20250624_124645_00_271.jpg",
-      "gps": [
-        106.2569521700316,
-        -5.4504618500017346
-      ],
-      "panoData": {
-        "poseHeading": 0
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105601_00_037_compressed.jpg",
+      "gps": [106.25680534999726, -5.4504971900023245, 35.68501003152766],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
       },
-      "links": {
-        "next": {
-          "nodeId": "1"
-        },
-        "prev": {
-          "nodeId": "7"
-        }
-      },
+      "links": [],
       "_metadata": {
-        "filename": "IMG_20250624_124645_00_271.jpg",
-        "originalLinks": [],
-        "northCalibration": null
+        "filename": "IMG_20250624_105601_00_037.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "9",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105618_00_038_compressed.jpg",
+      "gps": [106.25681507996316, -5.450497919996721, 35.668353988479666],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_105618_00_038.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "10",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105638_00_039_compressed.jpg",
+      "gps": [106.25682253002596, -5.450498489996225, 35.66922290388548],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_105638_00_039.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "11",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105653_00_040_compressed.jpg",
+      "gps": [106.2568295600027, -5.450499089999091, 35.67485182049111],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_105653_00_040.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "12",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105709_00_041_compressed.jpg",
+      "gps": [106.25683740001344, -5.4504999600032, 35.67215302491103],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_105709_00_041.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "13",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105728_00_042_compressed.jpg",
+      "gps": [106.25684547001657, -5.450499870000027, 35.66235405490691],
+      "sphereCorrection": {
+        "pan": 298.3693278005778,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [
+        {
+          "nodeId": "7"
+        },
+        {
+          "nodeId": "25"
+        }
+      ],
+      "_metadata": {
+        "filename": "IMG_20250624_105728_00_042.jpg",
+        "northCalibration": {
+          "heading": 298.3693278005778,
+          "isSet": true
+        },
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "14",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105748_00_043_compressed.jpg",
+      "gps": [106.25685183999772, -5.450499820000514, 35.657975986277876],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_105748_00_043.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "15",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105812_00_044_compressed.jpg",
+      "gps": [106.2568599399896, -5.4504997900042005, 35.64517405063291],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_105812_00_044.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "16",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105837_00_045_compressed.jpg",
+      "gps": [106.25686706003741, -5.450499649999054, 35.63667232597623],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_105837_00_045.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "17",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105903_00_046_compressed.jpg",
+      "gps": [106.25687382997467, -5.450500529999817, 35.63454198473283],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_105903_00_046.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "18",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_105959_00_047_compressed.jpg",
+      "gps": [106.25678244005641, -5.450502579998289, 35.715514018691586],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_105959_00_047.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "19",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_110019_00_048_compressed.jpg",
+      "gps": [106.2567757800048, -5.450503, 35.71193866374589],
+      "sphereCorrection": {
+        "pan": 37.641296752002106,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [
+        {
+          "nodeId": "7"
+        },
+        {
+          "nodeId": "1"
+        }
+      ],
+      "_metadata": {
+        "filename": "IMG_20250624_110019_00_048.jpg",
+        "northCalibration": {
+          "heading": 37.641296752002106,
+          "isSet": true
+        },
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "20",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_110042_00_049_compressed.jpg",
+      "gps": [106.2567695200177, -5.450502770004805, 35.710520981147376],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_110042_00_049.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "21",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_110103_00_050_compressed.jpg",
+      "gps": [106.25676337002947, -5.450501769999751, 35.71286610878661],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_110103_00_050.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "22",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_110121_00_051_compressed.jpg",
+      "gps": [106.256756, -5.4505030200000535, 35.70908900304015],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_110121_00_051.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "23",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_110134_00_052_compressed.jpg",
+      "gps": [106.2567512300123, -5.450504030001119, 35.703826955074874],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_110134_00_052.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "24",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_110855_00_053_compressed.jpg",
+      "gps": [106.25687301004163, -5.450491419999913, 35.63631889763779],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_110855_00_053.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "25",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_110935_00_054_compressed.jpg",
+      "gps": [106.25687323005164, -5.450487320000001, 36.23209099709584],
+      "sphereCorrection": {
+        "pan": 170.4303286740204,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [
+        {
+          "nodeId": "13"
+        },
+        {
+          "nodeId": "28"
+        }
+      ],
+      "_metadata": {
+        "filename": "IMG_20250624_110935_00_054.jpg",
+        "northCalibration": {
+          "heading": 170.4303286740204,
+          "isSet": true
+        },
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "26",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_110956_00_055_compressed.jpg",
+      "gps": [106.25687289006312, -5.4504842, 36.77571884984025],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_110956_00_055.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "27",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_111015_00_056_compressed.jpg",
+      "gps": [106.25687340000368, -5.45048096, 37.328838951310864],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_111015_00_056.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "28",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_111042_00_057_compressed.jpg",
+      "gps": [106.25687344005509, -5.45047825, 37.84240506329114],
+      "sphereCorrection": {
+        "pan": 205.79503814639313,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [
+        {
+          "nodeId": "25"
+        }
+      ],
+      "_metadata": {
+        "filename": "IMG_20250624_111042_00_057.jpg",
+        "northCalibration": {
+          "heading": 205.79503814639313,
+          "isSet": true
+        },
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "29",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_111100_00_058_compressed.jpg",
+      "gps": [106.25687311002558, -5.4504747800042415, 38.34779411764706],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_111100_00_058.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "30",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_111125_00_059_compressed.jpg",
+      "gps": [106.25687330998034, -5.450468229996924, 38.360207100591715],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_111125_00_059.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "31",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_111859_00_060_compressed.jpg",
+      "gps": [106.25679669996973, -5.450412510001001, 35.77588996763754],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_111859_00_060.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "32",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_111910_00_061_compressed.jpg",
+      "gps": [106.25680501999429, -5.450412879998782, 35.77095516569201],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_111910_00_061.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "33",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_111921_00_062_compressed.jpg",
+      "gps": [106.2568114000076, -5.45041308999976, 35.77153920619555],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_111921_00_062.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "34",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_111934_00_063_compressed.jpg",
+      "gps": [106.25681830004162, -5.45041375, 35.779181017986986],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_111934_00_063.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "35",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_111949_00_064_compressed.jpg",
+      "gps": [106.2568255499807, -5.4504144499973135, 35.765723270440255],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_111949_00_064.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "36",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112003_00_065_compressed.jpg",
+      "gps": [106.25683263997226, -5.450415010000241, 35.75726101173303],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112003_00_065.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "37",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112017_00_066_compressed.jpg",
+      "gps": [106.25684069000508, -5.4504155, 35.767711962833914],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112017_00_066.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "38",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112034_00_067_compressed.jpg",
+      "gps": [106.25684852999987, -5.450416529998633, 35.762033898305084],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112034_00_067.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "39",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112052_00_068_compressed.jpg",
+      "gps": [106.25685625, -5.450416509999821, 35.757736943907155],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112052_00_068.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "40",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112111_00_069_compressed.jpg",
+      "gps": [106.2568637700098, -5.450417310001716, 35.748606811145514],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112111_00_069.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "41",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112131_00_070_compressed.jpg",
+      "gps": [106.2568715099715, -5.4504173800012685, 35.74556101246694],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112131_00_070.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "42",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112152_00_071_compressed.jpg",
+      "gps": [106.25687985000216, -5.45041718999985, 35.72997098861861],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112152_00_071.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "43",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112212_00_072_compressed.jpg",
+      "gps": [106.25688743003454, -5.4504164, 35.73029597605587],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112212_00_072.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "44",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112233_00_073_compressed.jpg",
+      "gps": [106.25689547999893, -5.450417459999332, 35.72196416721964],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112233_00_073.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "45",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112251_00_074_compressed.jpg",
+      "gps": [106.25690257000383, -5.450418039999792, 35.71918367346939],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112251_00_074.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "46",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112309_00_075_compressed.jpg",
+      "gps": [106.25691202001634, -5.450418360000379, 35.701138050470064],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112309_00_075.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "47",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112326_00_076_compressed.jpg",
+      "gps": [106.25692033000863, -5.450418360000379, 35.68694096601073],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112326_00_076.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "48",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112343_00_077_compressed.jpg",
+      "gps": [106.25692808999901, -5.450419239999545, 35.68816998468606],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112343_00_077.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "49",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112400_00_078_compressed.jpg",
+      "gps": [106.25693409000398, -5.4504189, 35.684624017957354],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112400_00_078.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "50",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112410_00_079_compressed.jpg",
+      "gps": [106.2569406100046, -5.450419759998894, 35.68872017353579],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112410_00_079.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "51",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112420_00_080_compressed.jpg",
+      "gps": [106.25694725999176, -5.4504208199969515, 35.692122186495176],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112420_00_080.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "52",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112438_00_081_compressed.jpg",
+      "gps": [106.25695480001326, -5.450421760002038, 35.701845018450186],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112438_00_081.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "53",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112456_00_082_compressed.jpg",
+      "gps": [106.25695375, -5.4504294, 35.694894894894894],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112456_00_082.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "54",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112506_00_083_compressed.jpg",
+      "gps": [106.25695296999008, -5.450436750000001, 35.68626110731374],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112506_00_083.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "55",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112518_00_084_compressed.jpg",
+      "gps": [106.25695275995882, -5.450442620002056, 35.68197703444833],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112518_00_084.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "56",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112535_00_085_compressed.jpg",
+      "gps": [106.25695235001083, -5.450450960001132, 35.67769296013571],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112535_00_085.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "57",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112551_00_086_compressed.jpg",
+      "gps": [106.25695158999802, -5.45045852999996, 35.67580803134182],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112551_00_086.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "58",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112603_00_087_compressed.jpg",
+      "gps": [106.2569517600482, -5.450466129998158, 35.67777777777778],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112603_00_087.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "59",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112619_00_088_compressed.jpg",
+      "gps": [106.25695140999662, -5.450473090000497, 35.68266199649737],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112619_00_088.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "60",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112642_00_089_compressed.jpg",
+      "gps": [106.25695080005981, -5.450480530000579, 35.66860465116279],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112642_00_089.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "61",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112714_00_090_compressed.jpg",
+      "gps": [106.25695075003318, -5.450487380003509, 35.67138364779874],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112714_00_090.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "62",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112737_00_091_compressed.jpg",
+      "gps": [106.25695016003658, -5.450494969997677, 35.67191780821918],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112737_00_091.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "63",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_112801_00_092_compressed.jpg",
+      "gps": [106.25694970998995, -5.450501769999751, 35.677517802644964],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_112801_00_092.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "64",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_113133_00_093_compressed.jpg",
+      "gps": [106.2569637099945, -5.450439850000313, 35.67787794729542],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_113133_00_093.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "65",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_113148_00_094_compressed.jpg",
+      "gps": [106.25696258997158, -5.450445689999429, 35.68320610687023],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_113148_00_094.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "66",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_113202_00_095_compressed.jpg",
+      "gps": [106.25696264001134, -5.450451240001003, 36.26459004654493],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_113202_00_095.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "67",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_113216_00_096_compressed.jpg",
+      "gps": [106.25696212995003, -5.4504564500021715, 36.846390168970814],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_113216_00_096.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "68",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_113234_00_097_compressed.jpg",
+      "gps": [106.25696211997607, -5.450461549999348, 37.428812131423754],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_113234_00_097.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "69",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_113257_00_098_compressed.jpg",
+      "gps": [106.25696161001184, -5.450467169999547, 38.01152737752162],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_113257_00_098.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "70",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_113341_00_099_compressed.jpg",
+      "gps": [106.25696069994262, -5.450471810003182, 38.597122302158276],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_113341_00_099.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
+      }
+    },
+    {
+      "id": "71",
+      "panorama": "/images/Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624/IMG_20250624_113405_00_100_compressed.jpg",
+      "gps": [106.25695947000742, -5.450478070001455, 39.02602523659306],
+      "sphereCorrection": {
+        "pan": 0,
+        "tilt": 0,
+        "roll": 0
+      },
+      "links": [],
+      "_metadata": {
+        "filename": "IMG_20250624_113405_00_100.jpg",
+        "northCalibration": null,
+        "project": "Pertamina",
+        "section": "Cinta_P",
+        "subSection": "07CintaP_LivingQuarterDeck_20250624",
+        "directoryPath": "Pertamina/Cinta_P/07CintaP_LivingQuarterDeck_20250624",
+        "wasVisible": true
       }
     }
   ]

@@ -279,9 +279,7 @@
                       :key="`visible-${img.filename}`"
                       :value="getOriginalImageIndex(img)"
                     >
-                      {{
-                        getImageDisplayName(img, getOriginalImageIndex(img))
-                      }}
+                      {{ getImageDisplayName(img, getOriginalImageIndex(img)) }}
                       ✅
                     </option>
                   </optgroup>
